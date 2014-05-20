@@ -1,0 +1,10 @@
+How to change IP address/range
+
+Login on EV3 :
+ssh root@10.0.1.1
+
+edit /home/root/lejos/bin/network
+    change IP address
+
+edit /home/root/lejos/bin/udhcp
+    change IP range fo the DHCP server
