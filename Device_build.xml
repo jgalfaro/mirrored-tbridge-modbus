@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="tollbridge" basedir="." default="copy">
+    <property name="source.dir"     value="src"/>
+    <property name="lib.dir"        value="/home/user/lejos/lib/ev3"/>
+    <property name="class.dir"      value="bin"/>
+    <property name="jar.dir"        value="dist"/>
+    <property name="main-class"     value="DeviceInit"/>
+    <property name="lejos.home"     value="/home/user/lejos"/>
+    <property name="ev3.host"       value="10.0.1.1"/>
+
+    <path id="libraries.path">    
+        <fileset dir="${lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="/home/user/projects/tollbridge/lib">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+	
+    <target name="clean" description="delete old files">
+        <delete dir="${class.dir}"/>
+        <delete dir="${jar.dir}"/>
+    </target>
+
+    <target name="compile" description="build class files" depends="clean">
+        <mkdir dir="${class.dir}"/>
+        <javac srcdir="${source.dir}" destdir="${class.dir}" includeantruntime="false" >
+            <classpath refid="libraries.path"/>
+        </javac>
+    </target>
+
+    <target name="jar" description="Archive class in jar" depends="compile">
+        <mkdir dir="${jar.dir}"/>
+        <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${class.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+                <attribute name="Class-Path" value="${lejos.home}/lib/ev3classes.jar ${lejos.home}/libjna/usr/share/java/jna.jar"/>
+            </manifest>
+        </jar>  
+    </target>
+
+    <target name="copy" description="send class files to EV3" depends="jar">
+        <scp todir="root:@${ev3.host}:/home/lejos/programs/" trust="true">
+            <fileset file="${jar.dir}/${ant.project.name}.jar"/>
+        </scp>
+    </target>
+</project>

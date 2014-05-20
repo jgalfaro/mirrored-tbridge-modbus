@@ -409,9 +409,8 @@ public final class ModbusUtil {
   }//getAddressFromBytes
   */
 
-  //TODO: John description.
   /**
-   * Returs the low byte of an integer word.
+   * Returns the low byte of an integer word.
    *
    * @param wd
    * @return
@@ -420,7 +419,6 @@ public final class ModbusUtil {
     return (new Integer(0xff & wd).byteValue());
   }// lowByte
 
-  //TODO: John description.
   /**
    *
    * @param wd
@@ -430,7 +428,6 @@ public final class ModbusUtil {
     return (new Integer(0xff & (wd >> 8)).byteValue());
   }// hiByte
 
-   //TODO: John description.
   /**
    *
    * @param hibyte
