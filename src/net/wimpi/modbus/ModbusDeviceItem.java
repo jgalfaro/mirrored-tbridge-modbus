@@ -5,7 +5,8 @@ public class ModbusDeviceItem {
 	private String m_Value;
 	
 	public ModbusDeviceItem() {
-		
+		m_Id=0;
+		m_Value="";
 	}
 	public ModbusDeviceItem(int id, String value) {
 		this.m_Id = id;
@@ -21,6 +22,6 @@ public class ModbusDeviceItem {
 	}
 
 	public int getValueLength() {
-		return m_Value.length();
+		return m_Value.length() * 2; //each char takes two bytes
 	}
 }

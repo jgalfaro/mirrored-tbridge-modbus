@@ -1,43 +1,41 @@
 package device.util;
 
 import lejos.hardware.Button;
-import net.wimpi.modbus.procimg.*;
 
-public final class ButtonSensorRegisterIn extends SynchronizedAbstractRegister implements InputRegister {
+public final class ButtonSensorRegisterIn extends AbstractSensorRegisterIn {
 
-  public ButtonSensorRegisterIn() {
-  }
+	public ButtonSensorRegisterIn() {
+	}//constructor
 
-  public final int getValue() {
-  //TODO Change to support multiple key press 
-	if (Button.UP.isDown()) {
-    	return Button.ID_UP;
-    }
-    
-    if (Button.ENTER.isDown()) {
-    	return Button.ID_ENTER;
-    }
-    
-    if (Button.DOWN.isDown()) {
-    	return Button.ID_DOWN;
-    }
-    
-    if (Button.RIGHT.isDown()) {
-    	return Button.ID_RIGHT;
-    }
+	public int getSensorValue() {
+		int buttons = 0;
 
-    if (Button.LEFT.isDown()) {
-    	return Button.ID_LEFT;
-    }
-    
-    if (Button.ESCAPE.isDown()) {
-    	return Button.ID_ESCAPE;
-    }
+		if (Button.UP.isDown()) {
+			buttons += Button.ID_UP;
+		}
 
-    return 0;
-  }
+		if (Button.ENTER.isDown()) {
+			buttons += Button.ID_ENTER;
+		}
 
-  public final boolean isValid() {
-    return true;
-  }
+		if (Button.DOWN.isDown()) {
+			buttons += Button.ID_DOWN;
+		}
+
+		if (Button.RIGHT.isDown()) {
+			buttons += Button.ID_RIGHT;
+
+		}
+
+		if (Button.LEFT.isDown()) {
+			buttons += Button.ID_LEFT;
+		}
+
+		if (Button.ESCAPE.isDown()) {
+			buttons += Button.ID_ESCAPE;
+		}
+		return buttons;
+	}
+
+		
 }

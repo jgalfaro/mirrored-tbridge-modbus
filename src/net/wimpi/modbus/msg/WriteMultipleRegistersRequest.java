@@ -92,7 +92,6 @@ public final class WriteMultipleRegistersRequest
       ProcessImage procimg = ModbusCoupler.getReference().getProcessImage();
       //2. get registers
       try {
-        //TODO: realize a setRegisterRange()?
         regs = procimg.getRegisterRange(this.getReference(), this.getWordCount());
         //3. set Register values
         for (int i = 0; i < regs.length; i++) {

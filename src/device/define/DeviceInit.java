@@ -24,11 +24,14 @@ public class DeviceInit {
 	    
 		if (deviceType.equals("TOLL")) {
 		    device = new Toll(modbusAddr, modbusPort, modbusUnitId);
+		} else if (deviceType.equals("TOLL_SIM")) {
+		    device = new TollSim(modbusAddr, modbusPort, modbusUnitId);
 		} else if (deviceType.equals("BRIDGE")) {
 		    device = new Bridge(modbusAddr, modbusPort, modbusUnitId);
 		} else {
 			System.err.println("Device type ("+deviceType+") unknown");
 		}
+		
 		if (device != null) {
 			device.initEV3();
 			device.initModbus();

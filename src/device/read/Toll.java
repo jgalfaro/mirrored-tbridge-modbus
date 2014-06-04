@@ -1,23 +1,31 @@
 package device.read;
 
+import java.awt.Container;
 import java.net.UnknownHostException;
 
-public class Toll extends Device {
+import device.read.graphics.TollPanel;
 
+public class Toll extends Device {
 	//Discrete Input
 	private static final int STATUS_BARRIER = 0; 
+	
 	//Discrete Output
 	private static final int STATUS_ACTIVE = 0;	
 	private static final int STATUS_FREE = 1;
-	//Input Register
-	private static final int STATUS_COIN_COLOR = 0;
-	private static final int STATUS_CAR_PASSAGE = 1;
-	private static final int STATUS_KEY_PRESS = 2;
-	//Holding Register	
-	private static final int STATUS_NAME_ID = 0;
-	private static final int STATUS_NB_CARS = 1;
-	private static final int STATUS_NB_COINS = 2;
 	
+	//Holding Register	
+	private static final int STATUS_NB_CARS = 0;
+	private static final int STATUS_NB_COINS = 1;
+
+	//Input Register
+	private static final int STATUS_UNIT_ID = 0;
+	private static final int STATUS_COIN_COLOR = 1;
+	private static final int STATUS_CAR_PASSAGE = 2;
+	private static final int STATUS_KEY_PRESS = 3;
+		
+
+	
+	public TollPanel panel;
 	
 	public Toll (String address, int port) throws UnknownHostException {
     	super(address, port);
@@ -29,6 +37,18 @@ public class Toll extends Device {
 
 	public Toll () {
 		super();
+	}
+
+	public void initPanel(Container container, int x, int y) {
+		panel = new TollPanel(this, container, x, y);
+	}
+	
+	public TollPanel getPanel() {
+		return panel;
+	}
+
+	public int getUnitId() {
+		return this.getIntRO(Toll.STATUS_UNIT_ID);
 	}
 
 	public boolean getStatusBarrier() {
@@ -73,14 +93,6 @@ public class Toll extends Device {
 
 	public void setStatusNbCars(int value) {
 		this.setInt(Toll.STATUS_NB_CARS, value);
-	}
-	
-	public int getStatusNameId() {
-		return this.getIntRW(Toll.STATUS_NAME_ID);
-	}
-
-	public void setStatusNameId(int value) {
-		this.setInt(Toll.STATUS_NAME_ID, value);
 	}
 	
 	public int getStatusNbCoins() {

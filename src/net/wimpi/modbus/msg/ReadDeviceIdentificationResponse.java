@@ -94,11 +94,11 @@ public final class ReadDeviceIdentificationResponse
 	      item = e.nextElement();
 	  	  
 	      //Check limit of 255 o for a packet length
-	      if ( totalBytes + 2 + item.getValueLength() * 2 > 255) {
+	      if ( totalBytes + 2 + item.getValueLength() > 255) {
 	    	 break;
 	      }
 
-	      totalBytes += 2 + item.getValueLength() * 2;
+	      totalBytes += 2 + item.getValueLength();
 	  }
  
 	  return totalBytes;
@@ -128,8 +128,31 @@ public final class ReadDeviceIdentificationResponse
   
   public void writeData(DataOutput dout)
       throws IOException {
-	  int totalBytes = 6;
+	  int totalBytes = 0;
+	  Enumeration<ModbusDeviceItem> e = Collections.enumeration(m_Extract);
+	  ModbusDeviceItem item;
 
+	  int nextObjectId = 0;
+	  boolean needFragmentation = false;
+	  //Determine the fragmentation and the next objectID
+	  e = Collections.enumeration(m_Extract);
+	  
+	  totalBytes = 6;
+	  int nbElementsSent = 0;
+	  while (e.hasMoreElements()) {
+	      item = e.nextElement();
+	  	  
+	      //Check limit of 255 o for a packet length
+	      if ( totalBytes + 2 + item.getValueLength() > 255) {
+	    	  System.err.println("Data too long, truncated. Next : " + nextObjectId);
+	    	  nextObjectId = item.getId();
+	    	  needFragmentation = true;
+	    	  break;
+	      }
+	      totalBytes += 2 + item.getValueLength();
+	      nbElementsSent++;
+	  }
+	  
 	  //Function code (already written)
 	  //MEI Type
 	  dout.writeByte(getMEIType());
@@ -138,35 +161,34 @@ public final class ReadDeviceIdentificationResponse
 	  //Conformity level
 	  dout.writeByte(getConformityLevel());
 	  //More follows
-	  //TODO accept to generate more answers than just one
-	  dout.writeByte(0);
+	  if (needFragmentation) {
+		  dout.writeByte(255);	  
+	  } else {
+		  dout.writeByte(0);
+	  }
 	  //Next Object ID
-	  //TODO if one packet => value = 0
-	  //Modbus.MAX_OBJECTS_PER_IDENTIFICATION_MESSAGE
-	  dout.writeByte(0);
+	  dout.writeByte(nextObjectId);
 	  //Number of objects
-	  dout.writeByte(getExtractCount());
+	  dout.writeByte(nbElementsSent);
 
-	  
-//	  for (ModbusDeviceItem item: m_Extract) {	  
-	  Enumeration<ModbusDeviceItem> e = Collections.enumeration(m_Extract);
-	  ModbusDeviceItem item;
+	  e = Collections.enumeration(m_Extract);
+	  totalBytes = 6;
 	  while (e.hasMoreElements()) {
 	      item = e.nextElement();
 	  	  
 	      //Check limit of 255 o for a packet length
-	      if ( totalBytes + 2 + item.getValueLength() * 2 > 255) {
-	    	  System.err.println("Data too long, truncated (fragmentation not implemented)");
+	      if ( totalBytes + 2 + item.getValueLength() > 255) {
+	    	  System.err.println("Data too long, truncated");
 	    	 break;
 	      }
 	      //Object Id
 		  dout.writeByte((Integer) item.getId());
 	      //Object Length
-		  dout.writeByte(item.getValueLength() * 2);
+		  dout.writeByte(item.getValueLength());
 	      //Object Value
 		  dout.writeChars(item.getValue());
 
-	      totalBytes += 2 + item.getValueLength() * 2;
+	      totalBytes += 2 + item.getValueLength();
 	  }
 	  	  
   }//writeData
@@ -188,7 +210,6 @@ public final class ReadDeviceIdentificationResponse
 	  //Conformity Level
 	  din.readUnsignedByte();
 	  //More follows
-	  //TODO accept this
 	  din.readUnsignedByte();
 	  //Next Object ID
 	  din.readUnsignedByte();

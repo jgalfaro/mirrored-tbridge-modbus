@@ -57,11 +57,10 @@ public final class ReadDeviceIdentificationRequest
     extends ModbusRequest {
 
   //instance attributes
-  private int m_MEIType = 0;
-  private int m_ReadDeviceCode = 0;
+  private int m_MEIType;
+  private int m_ReadDeviceCode;
   private int m_ObjectId = 0;
   
-
   /**
    * Constructs a new <tt>ReadMultipleRegistersRequest</tt>
    * instance.
@@ -69,7 +68,7 @@ public final class ReadDeviceIdentificationRequest
   public ReadDeviceIdentificationRequest() {
     super();
     setFunctionCode(Modbus.READ_DEVICE_IDENTIFICATION);
-    //4 bytes (remember unit identifier and function
+    //3 bytes (remember unit identifier and function
     //code are excluded)
     setDataLength(3);
   }//constructor

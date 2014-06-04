@@ -8,17 +8,12 @@ import net.wimpi.modbus.ModbusDeviceIdentification;
 import net.wimpi.modbus.net.ModbusTCPListener;
 import net.wimpi.modbus.procimg.SimpleProcessImage;
 
-import lejos.hardware.Audio;
-import lejos.hardware.BrickFinder;
-import lejos.hardware.ev3.EV3;
-
 /**
  * Defines a device
  * @author Ken LE PRADO
  * @version 1.0
  */
 abstract class Device  {
-	public EV3 ev3 = null;
 	
 	public SimpleProcessImage spi = null;
 	public ModbusDeviceIdentification mbIdent = null;
@@ -40,6 +35,8 @@ abstract class Device  {
 	 */
 	public void initModbus() {
 		this.initSpi();
+		//this.spi.setLocked(true);
+
 		this.initMbIdentification();
 
 		ModbusCoupler.getReference().setProcessImage(this.spi);
@@ -75,10 +72,7 @@ abstract class Device  {
 	/*
 	 * EV3 Initialisation
 	 */
-	public void initEV3() {		
-		this.ev3 = (EV3) BrickFinder.getDefault();
-		this.loadEV3();
-	}
+	abstract public void initEV3();
 	
 	abstract public void loadEV3();
 
@@ -87,17 +81,14 @@ abstract class Device  {
 	 */
 	abstract public void stopEV3();
 	
-			/*
+	/*
 	 * Thread to manage the device
 	 */
 	abstract public void run();
-	
+
 	/*
 	 * Sounds a beep
 	 */
-	public void beep() {
-		Audio audio = this.ev3.getAudio();
-		audio.systemSound(0);
-	}
+	abstract public void beep();
 
 }

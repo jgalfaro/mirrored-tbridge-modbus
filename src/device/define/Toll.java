@@ -8,11 +8,15 @@ import device.util.TouchSensorRegisterIn;
 import net.wimpi.modbus.ModbusDeviceIdentification;
 import net.wimpi.modbus.procimg.SimpleDigitalIn;
 import net.wimpi.modbus.procimg.SimpleDigitalOut;
+import net.wimpi.modbus.procimg.SimpleInputRegister;
 import net.wimpi.modbus.procimg.SimpleProcessImage;
 import net.wimpi.modbus.procimg.SimpleRegister;
 
+import lejos.hardware.Audio;
+import lejos.hardware.BrickFinder;
 //Lego EV3 imports
 import lejos.hardware.Button;
+import lejos.hardware.ev3.EV3;
 import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
@@ -32,6 +36,7 @@ public class Toll extends Device {
 	public Toll(String modbusAddr, int modbusPort, int modbusUnitId) {
 		super(modbusAddr, modbusPort, modbusUnitId);
 	}
+	public EV3 ev3 = null;
 
 	private RegulatedMotor barrierMotor = null;
 	private RegulatedMotor coinMotor = null;
@@ -43,17 +48,20 @@ public class Toll extends Device {
 	
 	//Discrete Input
 	private static final int STATUS_BARRIER = 0; 
+	
 	//Discrete Output
 	private static final int STATUS_ACTIVE = 0;	
 	private static final int STATUS_FREE = 1;
-	//Input Register
-	private static final int STATUS_COIN_COLOR = 0;
-	private static final int STATUS_CAR_PASSAGE = 1;
-	private static final int STATUS_KEY_PRESS = 2;
+	
 	//Holding Register	
-	private static final int STATUS_NAME_ID = 0;
-	private static final int STATUS_NB_CARS = 1;
-	private static final int STATUS_NB_COINS = 2;
+	private static final int STATUS_NB_CARS = 0;
+	private static final int STATUS_NB_COINS = 1;
+
+	//Input Register
+	private static final int STATUS_UNIT_ID = 0;
+	private static final int STATUS_COIN_COLOR = 1;
+	private static final int STATUS_CAR_PASSAGE = 2;
+	private static final int STATUS_KEY_PRESS = 3;
 		
 
 	/*
@@ -62,18 +70,23 @@ public class Toll extends Device {
 	public void initSpi() {		
 		this.spi = new SimpleProcessImage();
 
-		this.spi.addInputRegister(new ColorSensorRegisterIn(this.coinColorSensor)); //0 STATUS_COIN_COLOR
-		this.spi.addInputRegister(new TouchSensorRegisterIn(this.passageTouchSensor)); //1 STATUS_CAR_PASSAGE
-		this.spi.addInputRegister(new ButtonSensorRegisterIn()); //2 STATUS_KEY_PRESS
-
+		//Discrete output
 		this.spi.addDigitalOut(new SimpleDigitalOut(false)); //0 STATUS_ACTIVE
 		this.spi.addDigitalOut(new SimpleDigitalOut(false)); //1 STATUS_FREE
 
+		//Discrete input
 		this.spi.addDigitalIn(new SimpleDigitalIn(false)); //0 STATUS_BARRIER
 		
-		this.spi.addRegister(new SimpleRegister(this.modbusUnitId)); //0 Name Id
-		this.spi.addRegister(new SimpleRegister(0)); //1 Nb coins
-		this.spi.addRegister(new SimpleRegister(0)); //2 NB cars
+		//Holding registers
+		this.spi.addRegister(new SimpleRegister(0)); //0 Nb coins
+		this.spi.addRegister(new SimpleRegister(0)); //1 NB cars
+
+		//Input register
+		this.spi.addInputRegister(new SimpleInputRegister(this.modbusUnitId)); //0 STATUS_UNIT_ID
+		this.spi.addInputRegister(new ColorSensorRegisterIn(this.coinColorSensor)); //1 STATUS_COIN_COLOR
+		this.spi.addInputRegister(new TouchSensorRegisterIn(this.passageTouchSensor)); //2 STATUS_CAR_PASSAGE
+		this.spi.addInputRegister(new ButtonSensorRegisterIn()); //3 STATUS_KEY_PRESS
+
 	}
 	
 	public void initMbIdentification() {
@@ -88,7 +101,14 @@ public class Toll extends Device {
 		this.mbIdent.setIdentification(6, "LEGO TOLL LEJOS");
 		this.mbIdent.setIdentification(130, "NICE Comment");
 	}
-		
+	/*
+	 * EV3 Initialisation
+	 */
+	public void initEV3() {		
+		this.ev3 = (EV3) BrickFinder.getDefault();
+		this.loadEV3();
+	}
+
 	/*
 	 * EV3 Initialisation
 	 */
@@ -181,7 +201,7 @@ public class Toll extends Device {
 	 */
 	public void drawScreen() {
 		LCD.clearDisplay();
-		LCD.drawString("TOLL " + this.spi.getRegister(STATUS_NAME_ID).getValue(), 4, 0);
+		LCD.drawString("TOLL " + this.spi.getRegister(STATUS_UNIT_ID).getValue(), 4, 0);
 		LCD.drawString("Coins inside : " + this.spi.getRegister(STATUS_NB_COINS).getValue(), 1, 2);
 		LCD.drawString("Cars viewed  : " + this.spi.getRegister(STATUS_NB_CARS).getValue(), 1, 3);
 		LCD.drawString("ESC Exit", 7, 6);
@@ -245,4 +265,12 @@ public class Toll extends Device {
 		// car_passage == 0 : wait for car to free the sensor
 		while (this.spi.getInputRegister(STATUS_CAR_PASSAGE).getValue() == 1);
 	}
+	/*
+	 * Sounds a beep
+	 */
+	public void beep() {
+		Audio audio = this.ev3.getAudio();
+		audio.systemSound(0);
+	}
+
 }

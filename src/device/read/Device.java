@@ -22,7 +22,7 @@ import net.wimpi.modbus.msg.WriteSingleRegisterRequest;
 import net.wimpi.modbus.net.TCPMasterConnection;
 import net.wimpi.modbus.procimg.SimpleInputRegister;
 
-abstract class Device {
+public abstract class Device {
 
 	private InetAddress address = null;
 	private int port = 0;
@@ -46,6 +46,10 @@ abstract class Device {
 	public void setIp (String address) throws UnknownHostException {
 		this.address = InetAddress.getByName(address);
 	}
+	
+	public String getIp() {
+		return this.address.getHostAddress();
+	}
 
 	public void setPort (int port) {
 		this.port = port;
@@ -59,11 +63,12 @@ abstract class Device {
 		}
 	}
 	
-	abstract int getStatusNameId() ;
-
-	abstract void setStatusNameId(int value);
+	public String getLabel() {
+		return getIp() + " - id : " + getUnitId();
+	}
 	
-	
+	abstract int getUnitId();
+		
 	public boolean getBoolRW(int registerRef) {
 		int nbValues = 1;
 		boolean returnedValue;
@@ -72,19 +77,20 @@ abstract class Device {
 		ReadCoilsRequest request = new ReadCoilsRequest(registerRef, nbValues);
 		ReadCoilsResponse result = null;
     	trans.setRequest(request);
-		//System.err.println("Trying to read register " + registerRef);
+		
     	try {
     		trans.execute();
     		result = (ReadCoilsResponse) trans.getResponse();
     		returnedValue = result.getCoilStatus(0);
-    		//System.err.println("Value returned=" + returnedValue);
+    	
     		return returnedValue;
 
     	} catch (Exception e) {		    		
-    		System.err.println("Read failed");
+    		System.err.println("Read coil failed");
     	}
     	return false;
 	}	
+	
 	public boolean getBoolRO(int registerRef) {
 		int nbValues = 1;
 		boolean returnedValue;
@@ -93,16 +99,14 @@ abstract class Device {
 		ReadInputDiscretesRequest request = new ReadInputDiscretesRequest(registerRef, nbValues);
 		ReadInputDiscretesResponse result = null;
     	trans.setRequest(request);
-		//System.err.println("Trying to read register " + registerRef);
-    	try {
+		try {
     		trans.execute();
     		result = (ReadInputDiscretesResponse) trans.getResponse();
     		returnedValue = result.getDiscretes().getBit(0);
-    		//System.err.println("Value returned=" + returnedValue);
     		return returnedValue;
 
     	} catch (Exception e) {		    		
-    		System.err.println("Read failed");
+    		System.err.println("Read input discrete failed");
     	}
     	return false;
 	}
@@ -115,15 +119,13 @@ abstract class Device {
 		ReadMultipleRegistersRequest request = new ReadMultipleRegistersRequest(registerRef, nbValues);
 		ReadMultipleRegistersResponse result = null;
     	trans.setRequest(request);
-		//System.err.println("Trying to read register " + registerRef);
     	try {
     		trans.execute();
     		result = (ReadMultipleRegistersResponse) trans.getResponse();
     		returnedValue = result.getRegisterValue(0);
-    		//System.err.println("Value returned=" + returnedValue);
     		return returnedValue;
     	} catch (Exception e) {		    		
-    		System.err.println("Read failed");
+    		System.err.println("Read multiple register failed");
     	}
     	return 0;
 	}
@@ -140,10 +142,9 @@ abstract class Device {
     		trans.execute();
     		result = (ReadInputRegistersResponse) trans.getResponse();
     		returnedValue = result.getRegisterValue(0);
-    		//System.err.println("Value returned=" + returnedValue);
     		return returnedValue;
     	} catch (Exception e) {		    		
-    		System.err.println("Read failed");
+    		System.err.println("Read input register failed");
     	}
     	return 0;
 	}
@@ -157,7 +158,7 @@ abstract class Device {
     		trans.execute();
     		trans.getResponse();
     	} catch (Exception e) {		    		
-    		System.err.println("Write failed");
+    		System.err.println("Write coil failed");
     	}
 	}
 		
@@ -170,7 +171,7 @@ abstract class Device {
     		trans.execute();
     		trans.getResponse();
     	} catch (Exception e) {		    		
-    		System.err.println("Write failed");
+    		System.err.println("Write input register failed");
     	}
 	}
 	
@@ -181,7 +182,6 @@ abstract class Device {
 		ReadDeviceIdentificationRequest request = new ReadDeviceIdentificationRequest(readType, objectId);
 		ReadDeviceIdentificationResponse result = null;
     	trans.setRequest(request);
-		System.out.println("Trying to read device Id " + readType + " " + objectId);
     	try {
     		trans.execute();
     		result = (ReadDeviceIdentificationResponse) trans.getResponse();

@@ -174,7 +174,7 @@ public final class ReadInputRegistersResponse
       throws IOException {
     dout.writeByte(m_ByteCount);
     for (int k = 0; k < getWordCount(); k++) {
-      dout.write(m_Registers[k].toBytes());
+        dout.write(m_Registers[k].toBytes());
     }
   }//writeData
 
