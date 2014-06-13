@@ -68,15 +68,15 @@ public class BridgePanel extends DevicePanel implements ActionListener {
 		//Button Bridge Moving			
 		btnBridgeMoveUp = new JButton("Up");
 		btnBridgeMoveUp.addActionListener(this);
-		btnBridgeMoveUp.setBounds(250, 150, 60, 20);
+		btnBridgeMoveUp.setBounds(245, 150, 75, 20);
 		content.add(btnBridgeMoveUp);
 		btnBridgeMoveStop = new JButton("Stop");
 		btnBridgeMoveStop.addActionListener(this);
-		btnBridgeMoveStop.setBounds(250, 170, 60, 20);
+		btnBridgeMoveStop.setBounds(245, 170, 75, 20);
 		content.add(btnBridgeMoveStop);
 		btnBridgeMoveDown = new JButton("Down");
 		btnBridgeMoveDown.addActionListener(this);
-		btnBridgeMoveDown.setBounds(250, 190, 60, 20);
+		btnBridgeMoveDown.setBounds(245, 190, 75, 20);
 		content.add(btnBridgeMoveDown);
 				
 		//Waiting boat
@@ -99,11 +99,11 @@ public class BridgePanel extends DevicePanel implements ActionListener {
 		//Buttons barrier
 		btnBridgeBarrierOn = new JButton("Up");
 		btnBridgeBarrierOn.addActionListener(this);
-		btnBridgeBarrierOn.setBounds(10, 170, 70, 20);
+		btnBridgeBarrierOn.setBounds(10, 170, 75, 20);
 		content.add(btnBridgeBarrierOn);
 		btnBridgeBarrierOff = new JButton("Down");
 		btnBridgeBarrierOff.addActionListener(this);
-		btnBridgeBarrierOff.setBounds(10, 190, 70, 20);
+		btnBridgeBarrierOff.setBounds(10, 190, 75, 20);
 		content.add(btnBridgeBarrierOff);
 		
 		//cars

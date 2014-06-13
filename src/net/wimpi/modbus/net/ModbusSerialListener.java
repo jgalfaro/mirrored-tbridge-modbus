@@ -109,7 +109,7 @@ public class ModbusSerialListener {
       } while (true);
 
     } catch (Exception e) {
-      //FIXME: this is a major failure, how do we handle this
+      // this is a major failure, how do we handle this
       e.printStackTrace();
     }
   }//listen

@@ -66,7 +66,7 @@ public class ThreadPool {
     try {
       m_TaskPool.put(task);
     } catch (InterruptedException ex) {
-      //FIXME: Handle!?
+      // Handle!?
     }
   }//execute
 
@@ -102,7 +102,7 @@ public class ThreadPool {
           //System.out.println(this.toString());
           ((Runnable) m_TaskPool.take()).run();
         } catch (Exception ex) {
-          //FIXME: Handle somehow!?
+          // Handle somehow!?
           ex.printStackTrace();
         }
       } while (true);

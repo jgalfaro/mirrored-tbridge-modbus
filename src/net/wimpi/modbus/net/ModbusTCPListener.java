@@ -152,7 +152,7 @@ public class ModbusTCPListener
         Socket incoming = m_ServerSocket.accept();
         if (Modbus.debug) System.out.println("Making new connection " + incoming.toString());
         if (m_Listening) {
-          //FIXME: Replace with object pool due to resource issues
+          //Replace with object pool due to resource issues
           m_ThreadPool.execute(
               new TCPConnectionHandler(
                   new TCPSlaveConnection(incoming)
@@ -171,7 +171,7 @@ public class ModbusTCPListener
         iex.printStackTrace();
       }
     } catch (IOException e) {
-      //FIXME: this is a major failure, how do we handle this
+      //this is a major failure, how do we handle this
     }
   }//run
 

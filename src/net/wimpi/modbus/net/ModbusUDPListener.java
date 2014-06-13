@@ -112,7 +112,7 @@ public class ModbusUDPListener {
       m_HandlerThread.start();
 
     } catch (Exception e) {
-      //FIXME: this is a major failure, how do we handle this
+      //this is a major failure, how do we handle this
     }
     m_Listening = true;
   }//start
