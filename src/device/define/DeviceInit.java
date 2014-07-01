@@ -28,6 +28,8 @@ public class DeviceInit {
 		    device = new TollSim(modbusAddr, modbusPort, modbusUnitId);
 		} else if (deviceType.equals("BRIDGE")) {
 		    device = new Bridge(modbusAddr, modbusPort, modbusUnitId);
+		} else if (deviceType.equals("ROVER")) {
+		    device = new Rover(modbusAddr, modbusPort, modbusUnitId);
 		} else {
 			System.err.println("Device type ("+deviceType+") unknown");
 		}

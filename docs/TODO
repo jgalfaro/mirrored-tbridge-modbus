@@ -3,11 +3,9 @@
 	* Msg types : all others types to implement
 - Better graphics on IHM
 	* Manage exceptions (connect)
-	* Graphical connection between elements 
 - Bridge
 	* Pb Gyro sensor
 - Toll
 	* better Lego construction
 - Other
-	* small car with telecommand
-	* make works with Bluetooth
+	* make works with Wifi
