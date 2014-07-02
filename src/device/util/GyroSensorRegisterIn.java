@@ -19,10 +19,16 @@ public final class GyroSensorRegisterIn extends AbstractSensorRegisterIn {
 	  }
 
 	public int getSensorValue() {
-
-		  angleProvider.fetchSample(angle, 0);
-		  int value = (int)angle[0];
-		  
+		
+		angleProvider.fetchSample(angle, 0);
+		
+		int value = (int)angle[0] % 360; 
+		
+		//to prevent a negative value (% 360  in java can produce negative numbers)
+		if (value < 0) {
+			value = value + 360;
+		}
+		
 		return (value);
 	}
 }
