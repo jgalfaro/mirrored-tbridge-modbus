@@ -1,5 +1,6 @@
 package control;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,12 +10,14 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JTextArea;
 
 public class HomeFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	private Container content;
 
+	private JTextArea messageLog;
 	
 	HomeFrame() {
 		super();
@@ -24,7 +27,7 @@ public class HomeFrame extends JFrame {
 	private void build(){
 		//Window properties
 		this.setTitle("Bridge Control Center"); 
-		this.setSize(600,400);
+		this.setSize(700,400);
 		this.setLocationRelativeTo(null); 				//Center
 		this.setResizable(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -79,14 +82,25 @@ public class HomeFrame extends JFrame {
 		content.setLayout(null);
 		//content.setBackground(Color.WHITE);
 		
+		messageLog = new JTextArea();
+		messageLog.setBounds(5, 5, 100, 300);
+		messageLog.setBackground(Color.white);
+		messageLog.setEditable(false);
+		content.add(messageLog);
+
 	}
-	
-
-
 	
 	public Container getContent() {
 		return content;
 	}
 
-	
+	public void addMessage(String message) {
+		
+		String currentText = messageLog.getText();
+		if (currentText.length() > 200) {
+			currentText = currentText.substring(0, 200);
+		}
+		messageLog.setText(message + "\n" + currentText); 
+		
+	}
 }

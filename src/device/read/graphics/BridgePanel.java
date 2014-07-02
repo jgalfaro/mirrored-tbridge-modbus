@@ -202,7 +202,7 @@ public class BridgePanel extends DevicePanel implements ActionListener {
 		picWaitingBoat.setVisible(false);
 		jlbBdgBoatWaiting.setVisible(false);
 	
-		bdgCanvas.setStatus(0, 0);
+		bdgCanvas.setStatus(0, 0, 0);
 	}
 	
 	public void showBridgeBarrierMode(boolean statusBarrier) {
@@ -250,8 +250,8 @@ public class BridgePanel extends DevicePanel implements ActionListener {
 		}
 	}
 	
-	public void showBridgeStatus(int bridgeAngle, int moveDirection) {
-		bdgCanvas.setStatus(bridgeAngle, moveDirection);
+	public void showBridgeStatus(int bridgeAngle, int moveDirection, int gyroAngle) {
+		bdgCanvas.setStatus(bridgeAngle, moveDirection, gyroAngle);
 
 	}
 	

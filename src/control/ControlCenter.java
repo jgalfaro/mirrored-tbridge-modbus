@@ -44,7 +44,7 @@ public class ControlCenter {
 
     	for (;;) {
     		TimeUnit.SECONDS.sleep(1);
-    		
+
     		//Refresh Tolls Status
     		Iterator<Toll> iter = tolls.iterator();
     	    while (iter.hasNext()) {
@@ -60,6 +60,8 @@ public class ControlCenter {
     	    		toll.getPanel().getStatusCoins().setText(Integer.toString(nbCoins));
     	    		toll.getPanel().showTollBarrier(statusBarrier);
     	    		toll.getPanel().showTollMode(statusOpened, statusFree);
+    	    	} else {
+    	    		delToll(toll);
     	    	}
     	    }
     		
@@ -75,8 +77,9 @@ public class ControlCenter {
 	    			statusMoving = bridge.getBridgeMoveDirection();
 		    		
 		    		Integer bridgeAngle = bridge.getBridgeAngle();
+		    		Integer bridgeGyroAngle = bridge.getStatusBridgeGyro();
 		    			
-		    		bridge.getPanel().showBridgeStatus(bridgeAngle, statusMoving);
+		    		bridge.getPanel().showBridgeStatus(bridgeAngle, statusMoving, bridgeGyroAngle);
 		    		
 		    		bridge.getPanel().showBridgeActivation(bridge.getStatusActivate());
 		    		bridge.getPanel().showBridgeMode(bridge.getStatusBridgeMove(), bridge.getStatusBridgeRaise());
@@ -85,6 +88,8 @@ public class ControlCenter {
 		    		bridge.getPanel().showWaitingBoat(waitingBoat);
 		    		bridge.getPanel().showBridgeBarrier(statusBarrier);
 		    		bridge.getPanel().getStatusBridgeCars().setText(Integer.toString(nbCars));
+	    		} else {
+	    			delBridge(bridge);
 	    		}
     	    }
     	}
@@ -117,11 +122,12 @@ public class ControlCenter {
 		
 		//We add to the graphics
 		int y = tolls.size() * 150 + 10;
-		myToll.initPanel(window.getContent(), 10, y);
+		myToll.initPanel(window.getContent(), 110, y);
 		
 		//We add to the collection
 		tolls.add(myToll);
-		
+		window.addMessage("new toll added");
+
 		refreshDevices();
 	}
 	
@@ -136,6 +142,7 @@ public class ControlCenter {
 		
 		//Remove reference
 		tolls.remove(myToll);
+		window.addMessage("toll removed");
 		
 		//refresh others Toll
 		refreshDevices();
@@ -154,7 +161,7 @@ public class ControlCenter {
 		Iterator<Bridge> iterB = bridges.iterator();
 	    while (iterB.hasNext()) {
 	    	Bridge bridge = (Bridge) iterB.next();
-	    	bridge.getPanel().updatePanel(250, y);
+	    	bridge.getPanel().updatePanel(350, y);
 	    	y += 250;
 	    }
 	    
@@ -176,7 +183,8 @@ public class ControlCenter {
 		
 		//We add to the collection
 		bridges.add(myBridge);
-		
+		window.addMessage("new bridge added");
+
 		refreshDevices();
 
 	}
@@ -192,7 +200,8 @@ public class ControlCenter {
 		
 		//Remove reference
 		bridges.remove(myBridge);
-		
+		window.addMessage("bridge removed");
+
 		//refresh others Toll
 		refreshDevices();
 
@@ -213,8 +222,6 @@ public class ControlCenter {
 			JOptionPane.showMessageDialog(window, "Impossible to set IP");
 			return null;
 		}
-
-		//			ControlCenter.toll1.setPort(1502);
 					
 		try {
 			if (!myToll.connect()) {

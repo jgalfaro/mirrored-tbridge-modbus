@@ -71,7 +71,6 @@ public class Bridge extends Device {
 	private static final int STATUS_SENSOR_MOVE = 5;
 	private static final int STATUS_SENSOR_ANGLE = 6;
 	
-	
 	/*
 	 * Modbus initialisation
 	 */
@@ -172,7 +171,7 @@ public class Bridge extends Device {
 		
 		while (((int)this.spi.getInputRegister(STATUS_SENSOR_BUTTON).getValue() & Button.ID_ESCAPE) == 0) {		
 			drawScreen();
-			Delay.msDelay(200);
+			Delay.msDelay(1000);
 			
 			/*
 			System.err.println("Digital In : " + this.spi.getDigitalIn(0).isSet() + "/"  + this.spi.getDigitalIn(1).isSet());
@@ -228,7 +227,7 @@ public class Bridge extends Device {
 					Button.LEDPattern(1); //Green
 					barrierUp();
 				} else {
-					Button.LEDPattern(0); //Red
+					Button.LEDPattern(2); //Red
 					barrierDown();
 				}
 	
@@ -262,10 +261,10 @@ public class Bridge extends Device {
 					this.spi.setDigitalIn(STATUS_WAITING_BOAT, new SimpleDigitalIn(false));	
 				}
 				
-			//Bridge disactivated
-			} else {
-				bridgeDown();
-				barrierDown();
+			//Bridge unactivated
+//			} else {
+//				bridgeDown();
+//				barrierDown();
 			}
 			
 		}
@@ -329,7 +328,7 @@ public class Bridge extends Device {
 		}
 			
 		//If not moving => let's go !
-		barrierDown();
+	//	barrierDown();
 		this.spi.setInputRegister(STATUS_SENSOR_MOVE, new SimpleInputRegister(1));
 
 		bridgeMotor.travel(BRIDGE_ANGLE - this.spi.getInputRegister(STATUS_SENSOR_ANGLE).getValue(), true);
@@ -388,7 +387,7 @@ public class Bridge extends Device {
 		}
 		
 		//If not moving => let's go !
-		barrierDown();
+	//	barrierDown();
 		this.spi.setInputRegister(STATUS_SENSOR_MOVE, new SimpleInputRegister(2));
 
 		bridgeMotor.travel(0 - this.spi.getInputRegister(STATUS_SENSOR_ANGLE).getValue(), true);

@@ -9,14 +9,14 @@ public class BridgeCanvas extends JPanel {
 	private static final long serialVersionUID = 8695090553402617092L;
 	private int angle = 0;
 	private int moving = 0;
-	
+	private int gyroAngle = 0;	
 	
 	public void paint(Graphics g) {
 		g.clearRect(0, 0, this.getWidth(), this.getHeight());
 		
 		g.setColor(Color.black);
 		
-		g.drawString(angle + " d.", 5, this.getHeight() - 10);
+		g.drawString(angle + " d. / " + gyroAngle, 5, this.getHeight() - 10);
 
 		switch(moving) {
 		case 0:
@@ -60,9 +60,10 @@ public class BridgeCanvas extends JPanel {
 		}
 	}
 
-	public void setStatus(int angle, int moving) {
+	public void setStatus(int angle, int moving, int gyroAngle) {
 		this.angle = angle;
 		this.moving = moving;
+		this.gyroAngle = gyroAngle;
 		this.repaint();
 	}	
 }

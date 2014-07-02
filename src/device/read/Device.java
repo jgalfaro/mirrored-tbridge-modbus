@@ -27,6 +27,8 @@ public abstract class Device {
 	private InetAddress address = null;
 	private int port = 0;
 	private TCPMasterConnection con = null;
+	private int errorCpt = 0;
+	private final int maxErrorNb = 5;
 	
 	public Device (String address, int port) throws UnknownHostException {
     	this.setIp(address);
@@ -82,10 +84,11 @@ public abstract class Device {
     		trans.execute();
     		result = (ReadCoilsResponse) trans.getResponse();
     		returnedValue = result.getCoilStatus(0);
-    	
+    		resetError();
     		return returnedValue;
 
     	} catch (Exception e) {		    		
+    		newError();
     		System.err.println("Read coil failed");
     	}
     	return false;
@@ -103,14 +106,16 @@ public abstract class Device {
     		trans.execute();
     		result = (ReadInputDiscretesResponse) trans.getResponse();
     		returnedValue = result.getDiscretes().getBit(0);
+    		resetError();
     		return returnedValue;
 
-    	} catch (Exception e) {		    		
+    	} catch (Exception e) {
+    		newError();
     		System.err.println("Read input discrete failed");
     	}
     	return false;
 	}
-
+	
 	public int getIntRW(int registerRef) {
 		int nbValues = 1;
 		int returnedValue;
@@ -123,8 +128,10 @@ public abstract class Device {
     		trans.execute();
     		result = (ReadMultipleRegistersResponse) trans.getResponse();
     		returnedValue = result.getRegisterValue(0);
+    		resetError();
     		return returnedValue;
     	} catch (Exception e) {		    		
+    		newError();
     		System.err.println("Read multiple register failed");
     	}
     	return 0;
@@ -142,8 +149,10 @@ public abstract class Device {
     		trans.execute();
     		result = (ReadInputRegistersResponse) trans.getResponse();
     		returnedValue = result.getRegisterValue(0);
+    		resetError();
     		return returnedValue;
     	} catch (Exception e) {		    		
+    		newError();
     		System.err.println("Read input register failed");
     	}
     	return 0;
@@ -157,7 +166,9 @@ public abstract class Device {
     	try {
     		trans.execute();
     		trans.getResponse();
-    	} catch (Exception e) {		    		
+    		resetError();
+    	} catch (Exception e) {
+    		newError();
     		System.err.println("Write coil failed");
     	}
 	}
@@ -170,7 +181,9 @@ public abstract class Device {
     	try {
     		trans.execute();
     		trans.getResponse();
+    		resetError();
     	} catch (Exception e) {		    		
+    		newError();
     		System.err.println("Write input register failed");
     	}
 	}
@@ -186,7 +199,9 @@ public abstract class Device {
     		trans.execute();
     		result = (ReadDeviceIdentificationResponse) trans.getResponse();
     		returnedValue = result.getDeviceIdent();
+    		resetError();
     	} catch (Exception e) {		    		
+    		newError();
     		System.err.println("Read device identification failed");
     	}
 		return returnedValue;
@@ -199,7 +214,6 @@ public abstract class Device {
     		con.connect();
     	} catch (Exception e) {
     		System.err.println("Connection error");
-    		e.printStackTrace();
     		return false;
     	}
 		return true;
@@ -210,6 +224,18 @@ public abstract class Device {
 			if (con.isConnected()) {
 				con.close();
 			}
+		}
+	}
+
+	private void resetError() {
+		errorCpt = 0;
+	}
+	
+	public void newError() {
+		errorCpt++;
+		if (errorCpt > maxErrorNb) {
+			System.err.println("Too much errors, disconnecting");
+			this.close();
 		}
 	}
 	

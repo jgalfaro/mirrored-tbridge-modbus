@@ -1,7 +1,6 @@
 package device.define;
 
 //Modbus imports
-import device.util.DetectedObjectListener;
 import net.wimpi.modbus.ModbusDeviceIdentification;
 import net.wimpi.modbus.procimg.SimpleProcessImage;
 
@@ -15,12 +14,8 @@ import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.EV3IRSensor;
-import lejos.robotics.RangeFinderAdaptor;
 import lejos.robotics.RegulatedMotor;
 import lejos.robotics.navigation.DifferentialPilot;
-import lejos.robotics.objectdetection.FeatureListener;
-import lejos.robotics.objectdetection.RangeFeatureDetector;
-import lejos.utility.Delay;
 
 /**
  * Toll management
