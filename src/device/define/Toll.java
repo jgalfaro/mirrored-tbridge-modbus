@@ -3,6 +3,7 @@ package device.define;
 import device.util.ButtonSensorRegisterIn;
 import device.util.ColorSensorRegisterIn;
 import device.util.TouchSensorRegisterIn;
+import device.util.UltrasonicSensorRegisterIn;
 
 //Modbus imports
 import net.wimpi.modbus.ModbusDeviceIdentification;
@@ -24,6 +25,7 @@ import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3TouchSensor;
+import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.robotics.RegulatedMotor;
 import lejos.utility.Delay;
 
@@ -40,9 +42,10 @@ public class Toll extends Device {
 
 	private RegulatedMotor barrierMotor = null;
 	private RegulatedMotor coinMotor = null;
-	public EV3ColorSensor coinColorSensor = null;
-	public EV3TouchSensor passageTouchSensor = null;
-
+	private EV3ColorSensor coinColorSensor = null;
+	private EV3TouchSensor passageTouchSensor = null;
+	private EV3UltrasonicSensor distanceUSSensor = null;
+	
 	private static int BARRIER_ANGLE = 80;
 	private static int COIN_ANGLE = 2200;
 	
@@ -62,6 +65,7 @@ public class Toll extends Device {
 	private static final int STATUS_COIN_COLOR = 1;
 	private static final int STATUS_CAR_PASSAGE = 2;
 	private static final int STATUS_KEY_PRESS = 3;
+	private static final int STATUS_CAR_PRESENTING = 4;
 		
 
 	/*
@@ -86,7 +90,7 @@ public class Toll extends Device {
 		this.spi.addInputRegister(new ColorSensorRegisterIn(this.coinColorSensor)); //1 STATUS_COIN_COLOR
 		this.spi.addInputRegister(new TouchSensorRegisterIn(this.passageTouchSensor)); //2 STATUS_CAR_PASSAGE
 		this.spi.addInputRegister(new ButtonSensorRegisterIn()); //3 STATUS_KEY_PRESS
-
+		this.spi.addInputRegister(new UltrasonicSensorRegisterIn(this.distanceUSSensor)); //4 STATUS_CAR_PRESENTING
 	}
 	
 	public void initMbIdentification() {
@@ -122,7 +126,7 @@ public class Toll extends Device {
 		
 		coinColorSensor = new EV3ColorSensor(SensorPort.S1);
 		passageTouchSensor = new EV3TouchSensor(SensorPort.S2);
-		
+		distanceUSSensor = new EV3UltrasonicSensor(SensorPort.S3);
 	}
 
 	/*
@@ -134,7 +138,7 @@ public class Toll extends Device {
 		coinMotor.close();
 		coinColorSensor.close();
 		passageTouchSensor.close();
-		
+		distanceUSSensor.close();
 	}
 	
 	/*
@@ -143,6 +147,7 @@ public class Toll extends Device {
 	public void run() {
 		int refColorId = this.spi.getInputRegister(STATUS_COIN_COLOR).getValue();
 		int coinColorId = 0;
+		int dist = 0;
 		
 		while (this.spi.getInputRegister(STATUS_KEY_PRESS).getValue() != Button.ID_ESCAPE) {
 			
@@ -164,7 +169,8 @@ public class Toll extends Device {
 					Button.LEDPattern(3); //Orange
 					//Is a coin inserted and waiting for action ?
 					coinColorId = this.spi.getInputRegister(STATUS_COIN_COLOR).getValue();
-					if (refColorId != coinColorId) {
+					dist = this.spi.getInputRegister(STATUS_CAR_PRESENTING).getValue();
+					if (refColorId != coinColorId && dist < 15) {
 						//System.out.println("New coin");
 						if (isValidCoin(coinColorId)) {
 							//System.out.println("Coin accepted");
@@ -204,6 +210,8 @@ public class Toll extends Device {
 		LCD.drawString("TOLL " + this.spi.getRegister(STATUS_UNIT_ID).getValue(), 4, 0);
 		LCD.drawString("Coins inside : " + this.spi.getRegister(STATUS_NB_COINS).getValue(), 1, 2);
 		LCD.drawString("Cars viewed  : " + this.spi.getRegister(STATUS_NB_CARS).getValue(), 1, 3);
+		LCD.drawString("Car Dist (cm): " + this.spi.getInputRegister(STATUS_CAR_PRESENTING).getValue(), 1, 4);
+		
 		LCD.drawString("ESC Exit", 7, 6);
 	}
 	

@@ -3,6 +3,8 @@ package device.define;
 import java.awt.Color;
 import java.util.concurrent.TimeUnit;
 
+import device.util.UltrasonicSensorRegisterIn;
+
 //Modbus imports
 import net.wimpi.modbus.ModbusDeviceIdentification;
 import net.wimpi.modbus.procimg.SimpleDigitalIn;
@@ -38,7 +40,7 @@ public class TollSim extends Device {
 	private static final int STATUS_COIN_COLOR = 1;
 	private static final int STATUS_CAR_PASSAGE = 2;
 	private static final int STATUS_KEY_PRESS = 3;
-		
+	private static final int STATUS_CAR_PRESENTING = 4;
 
 	/*
 	 * Modbus initialisation
@@ -62,6 +64,7 @@ public class TollSim extends Device {
 		this.spi.addInputRegister(new SimpleInputRegister(0)); //1 STATUS_COIN_COLOR
 		this.spi.addInputRegister(new SimpleInputRegister(0)); //2 STATUS_CAR_PASSAGE
 		this.spi.addInputRegister(new SimpleInputRegister(0)); //3 STATUS_KEY_PRESS
+		this.spi.addInputRegister(new SimpleInputRegister(0)); //4 STATUS_CAR_PRESENTING
 		
 	}
 	

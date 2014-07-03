@@ -22,7 +22,7 @@ public class Toll extends Device {
 	private static final int STATUS_COIN_COLOR = 1;
 	private static final int STATUS_CAR_PASSAGE = 2;
 	private static final int STATUS_KEY_PRESS = 3;
-		
+	private static final int STATUS_CAR_PRESENTING = 4;
 
 	
 	public TollPanel panel;
@@ -81,6 +81,10 @@ public class Toll extends Device {
 	
 	public int getStatusCarPassage() {
 		return this.getIntRO(Toll.STATUS_CAR_PASSAGE);
+	}
+	
+	public int getStatusCarPresenting() {
+		return this.getIntRO(Toll.STATUS_CAR_PRESENTING);
 	}
 	
 	public int getStatusKeyPress() {
