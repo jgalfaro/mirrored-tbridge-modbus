@@ -153,7 +153,7 @@ public class ControlCenter {
 		Iterator<Toll> iter = tolls.iterator();
 	    while (iter.hasNext()) {
 	    	Toll toll = (Toll) iter.next();
-	    	toll.getPanel().updatePanel(10, y);
+	    	toll.getPanel().updatePanel(110, y);
 	    	y += 150;
 	    }
 	    

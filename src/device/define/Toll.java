@@ -44,12 +44,12 @@ public class Toll extends Device {
 	public EV3TouchSensor passageTouchSensor = null;
 
 	private static int BARRIER_ANGLE = 80;
-	private static int COIN_ANGLE = 120;
+	private static int COIN_ANGLE = 2200;
 	
 	//Discrete Input
 	private static final int STATUS_BARRIER = 0; 
 	
-	//Discrete Output
+	//8Discrete Output
 	private static final int STATUS_ACTIVE = 0;	
 	private static final int STATUS_FREE = 1;
 	
@@ -118,7 +118,7 @@ public class Toll extends Device {
 		barrierMotor.setSpeed(60);
 		
 		coinMotor = new EV3MediumRegulatedMotor(MotorPort.A);
-		coinMotor.setSpeed(60);
+		coinMotor.setSpeed(2000);
 		
 		coinColorSensor = new EV3ColorSensor(SensorPort.S1);
 		passageTouchSensor = new EV3TouchSensor(SensorPort.S2);
@@ -246,13 +246,15 @@ public class Toll extends Device {
 		int nbCoins = this.spi.getRegister(STATUS_NB_COINS).getValue();
 		this.spi.setRegister(STATUS_NB_COINS, new SimpleRegister(nbCoins + 1));
 
-		coinMotor.rotate(- COIN_ANGLE);
+		coinMotor.rotate(+ Toll.COIN_ANGLE);
+		coinMotor.rotate(- Toll.COIN_ANGLE);
 	}
 	
 	/*
 	 * Activate motors to reject inserted coin
 	 */
 	public void rejectCoin() {
+		coinMotor.rotate(- Toll.COIN_ANGLE);
 		coinMotor.rotate(+ Toll.COIN_ANGLE);
 	}
 	
