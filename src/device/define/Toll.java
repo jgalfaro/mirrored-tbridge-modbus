@@ -49,7 +49,7 @@ public class Toll extends Device {
 	//Discrete Input
 	private static final int STATUS_BARRIER = 0; 
 	
-	//8Discrete Output
+	//Discrete Output
 	private static final int STATUS_ACTIVE = 0;	
 	private static final int STATUS_FREE = 1;
 	
