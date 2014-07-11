@@ -108,6 +108,12 @@ public interface Modbus {
 
   /**
    * Defines a standard function code
+   * for <tt>Mask write register</tt>.
+   */
+  public static final int MASK_WRITE_REGISTER = 22;
+  
+  /**
+   * Defines a standard function code
    * for <tt>read and write multiple registers</tt>.
    */
   public static final int READ_WRITE_MULTIPLE_REGISTERS = 23;

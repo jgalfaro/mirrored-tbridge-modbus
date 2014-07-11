@@ -5,10 +5,8 @@ import java.net.UnknownHostException;
 import device.read.Toll;
 import net.wimpi.modbus.ModbusDeviceIdentification;
 import net.wimpi.modbus.io.ModbusTCPTransaction;
-import net.wimpi.modbus.msg.ReadWriteMultipleRegistersRequest;
-import net.wimpi.modbus.msg.ReadWriteMultipleRegistersResponse;
-import net.wimpi.modbus.procimg.Register;
-import net.wimpi.modbus.procimg.SimpleRegister;
+import net.wimpi.modbus.msg.MaskWriteRegisterRequest;
+import net.wimpi.modbus.msg.MaskWriteRegisterResponse;
 
 public class modbusTester {
 
@@ -50,6 +48,8 @@ public class modbusTester {
 		}
 
 		
+		//Test the ReadWriteMultipleRegistersRequest
+/*		
 		ModbusTCPTransaction trans = new ModbusTCPTransaction(myToll.getConnection());
 
 		Register[] registers_W = new Register[2];
@@ -71,6 +71,38 @@ public class modbusTester {
     		e.printStackTrace();
     		System.err.println("Read Write failed");
     	}
+
+		*/
+		
+
+		
+		//Test the MaskWriteRegisterRequest
+	
+		ModbusTCPTransaction trans = new ModbusTCPTransaction(myToll.getConnection());
+
+		int ref = 1;
+		int andMask = 0xf2;
+		int orMask = 0x25;
+		
+		MaskWriteRegisterRequest request = new MaskWriteRegisterRequest(ref, andMask, orMask);
+		
+		MaskWriteRegisterResponse result = null;
+    	trans.setRequest(request);
+    	try {
+    		trans.execute();
+    		result = (MaskWriteRegisterResponse) trans.getResponse();
+
+    		System.out.println("Ref : " + result.getReference());
+    		System.out.println("And : " + result.getAndMask());
+    		System.out.println("Or : " + result.getOrMask());
+
+    	} catch (Exception e) {		
+    		e.printStackTrace();
+    		System.err.println("Mask Write failed");
+    	}
+
+		
+		
 		return ;
 		
 		

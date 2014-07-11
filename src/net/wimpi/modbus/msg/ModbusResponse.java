@@ -111,6 +111,9 @@ public abstract class ModbusResponse
       case Modbus.READ_WRITE_MULTIPLE_REGISTERS:
           response = new ReadWriteMultipleRegistersResponse();
           break;
+      case Modbus.MASK_WRITE_REGISTER:
+          response = new MaskWriteRegisterResponse();
+          break;          
       default:
         response = new ExceptionResponse();
         break;

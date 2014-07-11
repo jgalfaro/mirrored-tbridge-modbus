@@ -126,7 +126,10 @@ public abstract class ModbusRequest
           break;
       case Modbus.READ_WRITE_MULTIPLE_REGISTERS:
           request = new ReadWriteMultipleRegistersRequest();
-          break;      
+          break;
+      case Modbus.MASK_WRITE_REGISTER:
+          request = new MaskWriteRegisterRequest();
+          break;
       default:
         request = new IllegalFunctionRequest(functionCode);
         break;
