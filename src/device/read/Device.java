@@ -65,6 +65,9 @@ public abstract class Device {
 		}
 	}
 	
+	public TCPMasterConnection getConnection() {
+		return con;
+	}
 	public String getLabel() {
 		return getIp() + " - id : " + getUnitId();
 	}

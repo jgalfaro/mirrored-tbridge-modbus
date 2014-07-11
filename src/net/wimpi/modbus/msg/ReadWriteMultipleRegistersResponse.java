@@ -42,41 +42,44 @@ import net.wimpi.modbus.procimg.ProcessImageFactory;
 import net.wimpi.modbus.ModbusCoupler;
 
 /**
- * Class implementing a <tt>ReadMultipleRegistersResponse</tt>.
- * The implementation directly correlates with the class 0
- * function <i>read multiple registers (FC 3)</i>. It encapsulates
- * the corresponding response message.
+ * Class implementing a <tt>ReadWriteMultipleRegistersResponse</tt>.
  *
  * @author Dieter Wimberger
- * @version 1.2rc1 (09/11/2004)
+ * @version 1.2rc1 (09/07/2014)
  */
-public final class ReadMultipleRegistersResponse
+public final class ReadWriteMultipleRegistersResponse
     extends ModbusResponse {
 
   //instance attributes
-  private int m_ByteCount;
-  private Register[] m_Registers;
+  private int m_ByteCount_R;
+  private Register[] m_Registers_R;
 
+  private int m_WordCount_W;
+  private int m_Reference_W;
+  
   /**
-   * Constructs a new <tt>ReadMultipleRegistersResponse</tt>
+   * Constructs a new <tt>ReadWriteMultipleRegistersResponse</tt>
    * instance.
    */
-  public ReadMultipleRegistersResponse() {
+  public ReadWriteMultipleRegistersResponse() {
     super();
   }//constructor
 
   /**
-   * Constructs a new <tt>ReadInputRegistersResponse</tt>
+   * Constructs a new <tt>ReadWriteInputRegistersResponse</tt>
    * instance.
    *
    * @param registers the Register[] holding response registers.
    */
-  public ReadMultipleRegistersResponse(Register[] registers) {
+  public ReadWriteMultipleRegistersResponse(Register[] registers_R, int reference_W, int wordcount_W) {
     super();
-    m_Registers = registers;
-    m_ByteCount = registers.length * 2;
+    m_Registers_R = registers_R;
+    m_ByteCount_R = registers_R.length * 2;
+    m_Reference_W = reference_W;
+    m_WordCount_W = wordcount_W;
+
     //set correct data length excluding unit id and fc
-    setDataLength(m_ByteCount + 1);
+    setDataLength(m_ByteCount_R + 5);
   }//constructor
 
 
@@ -86,8 +89,8 @@ public final class ReadMultipleRegistersResponse
    * @return the number of bytes that have been read
    *         as <tt>int</tt>.
    */
-  public int getByteCount() {
-    return m_ByteCount;
+  public int getByteCountR() {
+    return m_ByteCount_R;
   }//getByteCount
 
   /**
@@ -99,8 +102,8 @@ public final class ReadMultipleRegistersResponse
    * @return the number of words that have been read
    *         as <tt>int</tt>.
    */
-  public int getWordCount() {
-    return m_ByteCount / 2;
+  public int getWordCountR() {
+    return m_ByteCount_R / 2;
   }//getWordCount
 
   /**
@@ -108,8 +111,8 @@ public final class ReadMultipleRegistersResponse
    * <p>
    * @param count the number of bytes as <tt>int</tt>.
    */
-  private void setByteCount(int count) {
-    m_ByteCount = count;
+  private void setByteCountR(int count) {
+    m_ByteCount_R = count;
   }//setByteCount
 
   /**
@@ -125,9 +128,9 @@ public final class ReadMultipleRegistersResponse
    * @throws IndexOutOfBoundsException if
    *         the index is out of bounds.
    */
-  public int getRegisterValue(int index)
+  public int getRegisterValueR(int index)
       throws IndexOutOfBoundsException {
-    return m_Registers[index].toUnsignedShort();
+    return m_Registers_R[index].toUnsignedShort();
   }//getRegisterValue
 
   /**
@@ -142,13 +145,13 @@ public final class ReadMultipleRegistersResponse
    * @throws IndexOutOfBoundsException if
    *         the index is out of bounds.
    */
-  public Register getRegister(int index)
+  public Register getRegisterR(int index)
       throws IndexOutOfBoundsException {
 
-    if (index >= getWordCount()) {
+    if (index >= getWordCountR()) {
       throw new IndexOutOfBoundsException();
     } else {
-      return m_Registers[index];
+      return m_Registers_R[index];
     }
   }//getRegister
 
@@ -158,31 +161,90 @@ public final class ReadMultipleRegistersResponse
    *
    * @return a <tt>Register[]</tt> instance.
    */
-  public Register[] getRegisters() {
-    return m_Registers;
+  public Register[] getRegistersR() {
+    return m_Registers_R;
   }//getRegisters
 
+  
+  
+
+  /**
+   * Sets the reference of the register to start writing to
+   * with this <tt>WriteMultipleRegistersResponse</tt>.
+   * <p>
+   * @param ref the reference of the register
+   *        to start writing to as <tt>int</tt>.
+   */
+  private void setReferenceW(int ref) {
+    m_Reference_W = ref;
+  }//setReference
+
+  /**
+   * Returns the reference of the register to start
+   * writing to with this
+   * <tt>WriteMultipleRegistersResponse</tt>.
+   * <p>
+   * @return the reference of the register
+   *        to start writing to as <tt>int</tt>.
+   */
+  public int getReferenceW() {
+    return m_Reference_W;
+  }//getReference
+
+
+  /**
+   * Returns the number of bytes that have been written.
+   * <p>
+   * @return the number of bytes that have been read
+   *         as <tt>int</tt>.
+   */
+  public int getByteCountW() {
+    return m_WordCount_W * 2;
+  }//getByteCount
+
+  /**
+   * Returns the number of words that have been read.
+   * The returned value should be half of
+   * the byte count of the response.
+   * <p>
+   * @return the number of words that have been read
+   *         as <tt>int</tt>.
+   */
+  public int getWordCountW() {
+    return m_WordCount_W;
+  }//getWordCount
+
+  /**
+   * Sets the number of words that have been returned.
+   * <p>
+   * @param count the number of words as <tt>int</tt>.
+   */
+  private void setWordCountW(int count) {
+    m_WordCount_W = count;
+  }//setWordCount
+  
+    
   public void writeData(DataOutput dout)
       throws IOException {
-    dout.writeByte(m_ByteCount);
-    for (int k = 0; k < getWordCount(); k++) {
-      dout.write(m_Registers[k].toBytes());
+    dout.writeByte(m_ByteCount_R);
+    for (int k = 0; k < getWordCountR(); k++) {
+      dout.write(m_Registers_R[k].toBytes());
     }
   }//writeData
 
   public void readData(DataInput din)
       throws IOException {
-    setByteCount(din.readUnsignedByte());
+    setByteCountR(din.readUnsignedByte());
 
-    m_Registers = new Register[getWordCount()];
+    m_Registers_R = new Register[getWordCountR()];
     ProcessImageFactory pimf = ModbusCoupler.getReference().getProcessImageFactory();
 
-    for (int k = 0; k < getWordCount(); k++) {
-      m_Registers[k] = pimf.createRegister(din.readByte(), din.readByte());
+    for (int k = 0; k < getWordCountR(); k++) {
+      m_Registers_R[k] = pimf.createRegister(din.readByte(), din.readByte());
     }
 
     //update data length
-    setDataLength(getByteCount() + 1);
+    setDataLength(getByteCountR() + 1);
   }//readData
 
 

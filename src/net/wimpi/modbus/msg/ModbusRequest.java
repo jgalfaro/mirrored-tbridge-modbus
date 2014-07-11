@@ -124,6 +124,9 @@ public abstract class ModbusRequest
       case Modbus.READ_DEVICE_IDENTIFICATION:
           request = new ReadDeviceIdentificationRequest();
           break;
+      case Modbus.READ_WRITE_MULTIPLE_REGISTERS:
+          request = new ReadWriteMultipleRegistersRequest();
+          break;      
       default:
         request = new IllegalFunctionRequest(functionCode);
         break;

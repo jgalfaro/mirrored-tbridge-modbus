@@ -107,6 +107,12 @@ public interface Modbus {
   public static final int MAX_OBJECTS_PER_IDENTIFICATION_MESSAGE = 10;
 
   /**
+   * Defines a standard function code
+   * for <tt>read and write multiple registers</tt>.
+   */
+  public static final int READ_WRITE_MULTIPLE_REGISTERS = 23;
+  
+  /**
    * Defines the byte representation of the coil state <b>on</b>.
    */
   public static final int COIL_ON = (byte) 255;

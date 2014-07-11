@@ -40,77 +40,89 @@ import java.io.IOException;
 import net.wimpi.modbus.Modbus;
 import net.wimpi.modbus.ModbusCoupler;
 import net.wimpi.modbus.io.NonWordDataHandler;
-import net.wimpi.modbus.procimg.*;
+import net.wimpi.modbus.procimg.IllegalAddressException;
+import net.wimpi.modbus.procimg.ProcessImage;
+import net.wimpi.modbus.procimg.ProcessImageFactory;
+import net.wimpi.modbus.procimg.Register;
 
 /**
- * Class implementing a <tt>ReadMultipleRegistersRequest</tt>.
+ * Class implementing a <tt>ReadWriteMultipleRegistersRequest</tt>.
  * The implementation directly correlates with the class 0
- * function <i>write multiple registers (FC 16)</i>. It
+ * function <i>read multiple registers (FC 3)</i>. It
  * encapsulates the corresponding request message.
  *
- * @author Dieter Wimberger
- * @version 1.2rc1 (09/11/2004)
+ * @author Ken LE PRADO
+ * @version 1.2rc1 (09/07/2014)
  */
-public final class WriteMultipleRegistersRequest
+public final class ReadWriteMultipleRegistersRequest
     extends ModbusRequest {
 
   //instance attributes
-  private int m_Reference;
-  private Register[] m_Registers;
-  private NonWordDataHandler m_NonWordDataHandler = null;
+  private int m_Reference_R;
+  private int m_WordCount_R;
+  private int m_Reference_W;
+  private Register[] m_Registers_W;
+  private NonWordDataHandler m_NonWordDataHandler_W = null;
 
+  
   /**
-   * Constructs a new <tt>WriteMultipleRegistersRequest</tt>
+   * Constructs a new <tt>ReadWriteMultipleRegistersRequest</tt>
    * instance.
    */
-  public WriteMultipleRegistersRequest() {
+  public ReadWriteMultipleRegistersRequest() {
     super();
-    setFunctionCode(Modbus.WRITE_MULTIPLE_REGISTERS);
+    setFunctionCode(Modbus.READ_WRITE_MULTIPLE_REGISTERS);
+    //4 bytes (remember unit identifier and function
+    //code are excluded)
+    setDataLength(4);
   }//constructor
 
   /**
-   * Constructs a new <tt>WriteMultipleRegistersRequest</tt>
-   * instance with a given reference and values to be written.
+   * Constructs a new <tt>ReadMultipleRegistersRequest</tt>
+   * instance with a given reference and count of words
+   * to be read.
    * <p>
    * @param ref the reference number of the register
    *        to read from.
-   * @param registers the registers to be written.
+   * @param count the number of words to be read.
    */
-  public WriteMultipleRegistersRequest(int ref, Register[] registers) {
+  public ReadWriteMultipleRegistersRequest(int ref_R, int count_R, int ref_W, Register[] registers_W) {
     super();
-    setFunctionCode(Modbus.WRITE_MULTIPLE_REGISTERS);
-    setReference(ref);
-    setRegisters(registers);
+    setFunctionCode(Modbus.READ_WRITE_MULTIPLE_REGISTERS);
+    setReferenceR(ref_R);
+    setWordCountR(count_R);
+    setReferenceW(ref_W);
+    setRegistersW(registers_W);
+
+    setDataLength(9 + getByteCountW());
+    
   }//constructor
 
   public ModbusResponse createResponse() {
-    WriteMultipleRegistersResponse response = null;
+    ReadMultipleRegistersResponse response = null;
+    Register[] regs = null;
 
-    if (m_NonWordDataHandler == null) {
-      Register[] regs = null;
-      //1. get process image
-      ProcessImage procimg = ModbusCoupler.getReference().getProcessImage();
-      //2. get registers
-      try {
-        regs = procimg.getRegisterRange(this.getReference(), this.getWordCount());
+    //1. get process image
+    ProcessImage procimg = ModbusCoupler.getReference().getProcessImage();
+
+    //2. Write values (before read)
+    try {
+        regs = procimg.getRegisterRange(this.getReferenceW(), this.getWordCountW());
         //3. set Register values
         for (int i = 0; i < regs.length; i++) {
-          regs[i].setValue(this.getRegister(i).toBytes());
+          regs[i].setValue(this.getRegisterW(i).toBytes());
         }
       } catch (IllegalAddressException iaex) {
         return createExceptionResponse(Modbus.ILLEGAL_ADDRESS_EXCEPTION);
       }
-      response = new WriteMultipleRegistersResponse(this.getReference(), regs.length);
-    } else {
-      int result = m_NonWordDataHandler.commitUpdate();
-      if (result > 0) {
-        return createExceptionResponse(result);
-      }
-      response = new WriteMultipleRegistersResponse(
-          this.getReference(),
-          m_NonWordDataHandler.getWordCount()
-      );
+    
+    //3. get input registers range
+    try {
+      regs = procimg.getRegisterRange(this.getReferenceR(), this.getWordCountR());
+    } catch (IllegalAddressException iaex) {
+      return createExceptionResponse(Modbus.ILLEGAL_ADDRESS_EXCEPTION);
     }
+    response = new ReadMultipleRegistersResponse(regs);
     //transfer header data
     if (!isHeadless()) {
       response.setTransactionID(this.getTransactionID());
@@ -120,31 +132,81 @@ public final class WriteMultipleRegistersRequest
     }
     response.setUnitID(this.getUnitID());
     response.setFunctionCode(this.getFunctionCode());
+
     return response;
   }//createResponse
 
   /**
-   * Sets the reference of the register to writing to
-   * with this <tt>WriteMultipleRegistersRequest</tt>.
+   * Sets the reference of the register to start reading
+   * from with this <tt>ReadMultipleRegistersRequest</tt>.
    * <p>
    * @param ref the reference of the register
-   *        to start writing to as <tt>int</tt>.
+   *        to start reading from.
    */
-  public void setReference(int ref) {
-    m_Reference = ref;
+  public void setReferenceR(int ref) {
+    m_Reference_R = ref;
   }//setReference
 
   /**
-   * Returns the reference of the register to start
-   * writing to with this
-   * <tt>WriteMultipleRegistersRequest</tt>.
+   * Returns the reference of the register to to start
+   * reading from with this
+   * <tt>ReadMultipleRegistersRequest</tt>.
    * <p>
    * @return the reference of the register
-   *        to start writing to as <tt>int</tt>.
+   *        to start reading from as <tt>int</tt>.
    */
-  public int getReference() {
-    return m_Reference;
+  public int getReferenceR() {
+    return m_Reference_R;
   }//getReference
+
+  /**
+   * Sets the number of words to be read with this
+   * <tt>ReadMultipleRegistersRequest</tt>.
+   * <p>
+   * @param count the number of words to be read.
+   */
+  public void setWordCountR(int count) {
+    m_WordCount_R = count;
+    //setChanged(true);
+  }//setWordCount
+
+  /**
+   * Returns the number of words to be read with this
+   * <tt>ReadMultipleRegistersRequest</tt>.
+   * <p>
+   * @return the number of words to be read as
+   *        <tt>int</tt>.
+   */
+  public int getWordCountR() {
+    return m_WordCount_R;
+  }//getWordCount
+
+  
+
+  /**
+   * Sets the reference of the register to start reading
+   * from with this <tt>ReadMultipleRegistersRequest</tt>.
+   * <p>
+   * @param ref the reference of the register
+   *        to start reading from.
+   */
+  public void setReferenceW(int ref) {
+    m_Reference_W = ref;
+  }//setReference
+
+  /**
+   * Returns the reference of the register to to start
+   * reading from with this
+   * <tt>ReadMultipleRegistersRequest</tt>.
+   * <p>
+   * @return the reference of the register
+   *        to start reading from as <tt>int</tt>.
+   */
+  public int getReferenceW() {
+    return m_Reference_W;
+  }//getReference
+  
+  
 
   /**
    * Sets the registers to be written with this
@@ -153,8 +215,8 @@ public final class WriteMultipleRegistersRequest
    * @param registers the registers to be written
    *        as <tt>Register[]</tt>.
    */
-  public void setRegisters(Register[] registers) {
-    m_Registers = registers;
+  public void setRegistersW(Register[] registers) {
+    m_Registers_W = registers;
   }//setRegisters
 
 
@@ -164,8 +226,8 @@ public final class WriteMultipleRegistersRequest
    * <p>
    * @return the registers to be written as <tt>Register[]</tt>.
    */
-  public Register[] getRegisters() {
-    return m_Registers;
+  public Register[] getRegistersW() {
+    return m_Registers_W;
   }//getRegisters
 
   /**
@@ -180,17 +242,16 @@ public final class WriteMultipleRegistersRequest
    * @throws IndexOutOfBoundsException if
    *         the index is out of bounds.
    */
-  public Register getRegister(int index)
+  public Register getRegisterW(int index)
       throws IndexOutOfBoundsException {
 
-    if (index >= getWordCount()) {
+    if (index >= getWordCountW()) {
       throw new IndexOutOfBoundsException();
     } else {
-      return m_Registers[index];
+      return m_Registers_W[index];
     }
   }//getRegister
-
-
+    
   /**
    * Returns the value of the register at
    * the given position (relative to the reference
@@ -204,10 +265,11 @@ public final class WriteMultipleRegistersRequest
    * @throws IndexOutOfBoundsException if
    *         the index is out of bounds.
    */
-  public int getRegisterValue(int index)
+  public int getRegisterValueW(int index)
       throws IndexOutOfBoundsException {
-    return m_Registers[index].toUnsignedShort();
+    return m_Registers_W[index].toUnsignedShort();
   }//getRegisterValue
+
 
   /**
    * Returns the number of bytes representing the
@@ -216,9 +278,10 @@ public final class WriteMultipleRegistersRequest
    * @return the number of bytes to be written
    *         as <tt>int</tt>.
    */
-  public int getByteCount() {
-    return getWordCount() * 2;
+  public int getByteCountW() {
+    return getWordCountW() * 2;
   }//getByteCount
+  
 
   /**
    * Returns the number of words to be written.
@@ -226,9 +289,10 @@ public final class WriteMultipleRegistersRequest
    * @return the number of words to be written
    *         as <tt>int</tt>.
    */
-  public int getWordCount() {
-    return m_Registers.length;
+  public int getWordCountW() {
+    return m_Registers_W.length;
   }//getWordCount
+
 
   /**
    * Sets a non word data handler.
@@ -236,7 +300,7 @@ public final class WriteMultipleRegistersRequest
    * @param dhandler a  <tt>NonWordDataHandler</tt> instance.
    */
   public void setNonWordDataHandler(NonWordDataHandler dhandler) {
-    m_NonWordDataHandler = dhandler;
+    m_NonWordDataHandler_W = dhandler;
   }//setNonWordDataHandler
 
   /**
@@ -245,48 +309,63 @@ public final class WriteMultipleRegistersRequest
    * @return the actual <tt>NonWordDataHandler</tt>.
    */
   public NonWordDataHandler getNonWordDataHandler() {
-    return m_NonWordDataHandler;
+    return m_NonWordDataHandler_W;
   }//getNonWordDataHandler
 
+  
   public void writeData(DataOutput dout)
       throws IOException {
+	  
+	  //Read part
+    dout.writeShort(m_Reference_R);
+    dout.writeShort(m_WordCount_R);
+    
+      //Write part
+    
     //1. the reference
-    dout.writeShort(m_Reference);
+    dout.writeShort(m_Reference_W);
     //2. the word count
-    dout.writeShort(getWordCount());
+    dout.writeShort(getWordCountW());
     //3. the byte count as byte
-    dout.writeByte(getByteCount());
+    dout.writeByte(getByteCountW());
     //4. write values
-    if (m_NonWordDataHandler == null) {
-      for (int n = 0; n < m_Registers.length; n++) {
-        dout.write(m_Registers[n].toBytes());
+    if (m_NonWordDataHandler_W == null) {
+      for (int n = 0; n < m_Registers_W.length; n++) {
+        dout.write(m_Registers_W[n].toBytes());
       }
     } else {
-      m_NonWordDataHandler.prepareData(getReference(), getWordCount());
-      dout.write(m_NonWordDataHandler.getData());
-    }
+      m_NonWordDataHandler_W.prepareData(getReferenceW(), getWordCountW());
+      dout.write(m_NonWordDataHandler_W.getData());
+    }  
+        
   }//writeData
 
   public void readData(DataInput din)
       throws IOException {
+    
+	//Read part  
+	m_Reference_R = din.readUnsignedShort();
+    m_WordCount_R = din.readUnsignedShort();
+    
+    //Write part
 
-    m_Reference = din.readShort();
+    m_Reference_W = din.readShort();
     //read lengths
     int wc = din.readUnsignedShort();
     int bc = din.readUnsignedByte();
 
     //read values
-    if (m_NonWordDataHandler == null) {
-      m_Registers = new Register[wc];
+    if (m_NonWordDataHandler_W == null) {
+      m_Registers_W = new Register[wc];
       ProcessImageFactory pimf = ModbusCoupler.getReference().getProcessImageFactory();
       for (int i = 0; i < wc; i++) {
-        m_Registers[i] = pimf.createRegister(din.readByte(), din.readByte());
+        m_Registers_W[i] = pimf.createRegister(din.readByte(), din.readByte());
       }
     } else {
-      m_NonWordDataHandler.readData(din, m_Reference, wc);
-    }
-  //TODO: Test on coherence on bc
-
+      m_NonWordDataHandler_W.readData(din, m_Reference_W, wc);
+    }  
+//TODO: Test on coherence on bc
+    
   }//readData
 
-}//class WriteMultipleRegistersRequest
+}//class ReadMultipleRegistersRequest
