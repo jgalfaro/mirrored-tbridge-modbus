@@ -1,4 +1,13 @@
 control
 device.define
 device.read
+device.read.graphics
 device.util
+net.wimpi.modbus
+net.wimpi.modbus.cmd
+net.wimpi.modbus.facade
+net.wimpi.modbus.io
+net.wimpi.modbus.msg
+net.wimpi.modbus.net
+net.wimpi.modbus.procimg
+net.wimpi.modbus.util

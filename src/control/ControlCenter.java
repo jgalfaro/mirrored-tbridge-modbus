@@ -41,6 +41,7 @@ public class ControlCenter {
     	int nbCoins;
     	boolean waitingBoat;
     	int statusMoving;
+    	int waitingBoatNb;
 
     	for (;;) {
     		TimeUnit.SECONDS.sleep(1);
@@ -74,6 +75,7 @@ public class ControlCenter {
 	    			statusBarrierMode = bridge.getStatusBarrierOpen();
 		    		nbCars = bridge.getStatusNbCars();
 		    		waitingBoat = bridge.getStatusWaitingBoat();
+		    		waitingBoatNb = bridge.getStatusBoatQueue();
 	    			statusMoving = bridge.getBridgeMoveDirection();
 		    		
 		    		Integer bridgeAngle = bridge.getBridgeAngle();
@@ -86,6 +88,7 @@ public class ControlCenter {
 		    		
 		    		bridge.getPanel().showBridgeBarrierMode(statusBarrierMode);
 		    		bridge.getPanel().showWaitingBoat(waitingBoat);
+		    		bridge.getPanel().setNbBoatWaiting(waitingBoatNb);
 		    		bridge.getPanel().showBridgeBarrier(statusBarrier);
 		    		bridge.getPanel().getStatusBridgeCars().setText(Integer.toString(nbCars));
 	    		} else {

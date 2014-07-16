@@ -1,7 +1,11 @@
 package device.define;
 
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import device.util.ButtonSensorRegisterIn;
+import device.util.ColorSensorRegisterIn;
 import device.util.GyroSensorRegisterIn;
 import device.util.MotorPoseSensorRegisterIn;
 import device.util.TouchSensorRegisterIn;
@@ -22,6 +26,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.SensorPort;
+import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.EV3GyroSensor;
 import lejos.hardware.sensor.EV3TouchSensor;
 import lejos.robotics.RegulatedMotor;
@@ -45,6 +50,7 @@ public class Bridge extends Device {
 	public EV3TouchSensor passageTouchSensor = null;
 	public EV3TouchSensor boatTouchSensor = null;
 	public EV3GyroSensor bridgeAngleSensor = null;
+	public EV3ColorSensor bridgeColorSensor = null;
 	
 	private static int BARRIER_ANGLE = 80;
 	private static int BRIDGE_ANGLE = 12;
@@ -70,6 +76,10 @@ public class Bridge extends Device {
 	private static final int STATUS_SENSOR_BOAT = 4;
 	private static final int STATUS_SENSOR_MOVE = 5;
 	private static final int STATUS_SENSOR_ANGLE = 6;
+	private static final int STATUS_BOAT_COLOR = 7;
+	private static final int STATUS_BOAT_QUEUE = 8;
+
+	private Queue<Integer> waitingBoats = null;
 	
 	/*
 	 * Modbus initialisation
@@ -92,12 +102,14 @@ public class Bridge extends Device {
 
 		//Digital Output
 		this.spi.addInputRegister(new SimpleRegister(this.modbusUnitId)); //0 STATUS_UNIT_ID
-		this.spi.addInputRegister(new ButtonSensorRegisterIn());				// 0 STATUS_SENSOR_BUTTON
-		this.spi.addInputRegister(new GyroSensorRegisterIn(bridgeAngleSensor)); // 1 STATUS_SENSOR_GYRO
-		this.spi.addInputRegister(new TouchSensorRegisterIn(passageTouchSensor)); // 2 STATUS_SENSOR_PASSAGE
-		this.spi.addInputRegister(new TouchSensorRegisterIn(boatTouchSensor));    // 3 STATUS_SENSOR_BOAT
-		this.spi.addInputRegister(new SimpleInputRegister(0));    					// 4 STATUS_SENSOR_MOVE
-		this.spi.addInputRegister(new MotorPoseSensorRegisterIn(bridgeMotor));    // 5 STATUS_SENSOR_ANGLE
+		this.spi.addInputRegister(new ButtonSensorRegisterIn());				// 1 STATUS_SENSOR_BUTTON
+		this.spi.addInputRegister(new GyroSensorRegisterIn(bridgeAngleSensor)); // 2 STATUS_SENSOR_GYRO
+		this.spi.addInputRegister(new TouchSensorRegisterIn(passageTouchSensor)); // 3 STATUS_SENSOR_PASSAGE
+		this.spi.addInputRegister(new TouchSensorRegisterIn(boatTouchSensor));    // 4 STATUS_SENSOR_BOAT
+		this.spi.addInputRegister(new SimpleInputRegister(0));    					// 5 STATUS_SENSOR_MOVE
+		this.spi.addInputRegister(new MotorPoseSensorRegisterIn(bridgeMotor));    // 6 STATUS_SENSOR_ANGLE
+		this.spi.addInputRegister(new ColorSensorRegisterIn(this.bridgeColorSensor)); //7 STATUS_BOAT_COLOR
+		this.spi.addInputRegister(new SimpleRegister(0)); //8 STATUS_BOAT_QUEUE
 		
 	}
 	
@@ -144,6 +156,8 @@ public class Bridge extends Device {
 
 		boatTouchSensor = new EV3TouchSensor(SensorPort.S2);
 		
+		bridgeColorSensor = new EV3ColorSensor(SensorPort.S3);
+
 		bridgeAngleSensor = new EV3GyroSensor(SensorPort.S4);
 	}
 
@@ -168,24 +182,21 @@ public class Bridge extends Device {
 	 * Thread to manage the device
 	 */
 	public void run() {
+		int refColorId = this.spi.getInputRegister(STATUS_BOAT_COLOR).getValue();
+		int boatColorId = 0;
+		boolean boatPresence = false;
+		waitingBoats = new LinkedList<Integer>();
 		
 		while (((int)this.spi.getInputRegister(STATUS_SENSOR_BUTTON).getValue() & Button.ID_ESCAPE) == 0) {		
 			drawScreen();
 			Delay.msDelay(1000);
 			
-			/*
-			System.err.println("Digital In : " + this.spi.getDigitalIn(0).isSet() + "/"  + this.spi.getDigitalIn(1).isSet());
-			System.err.println("Digital Out : " + this.spi.getDigitalOut(0).isSet() + "/"  + this.spi.getDigitalOut(1).isSet() + "/"  + this.spi.getDigitalOut(2).isSet() + "/"  + this.spi.getDigitalOut(3).isSet());
-			System.err.println("Input Registers : " + this.spi.getInputRegister(0).getValue() + "/" + this.spi.getInputRegister(1).getValue() + "/" + this.spi.getInputRegister(2).getValue() + "/" + this.spi.getInputRegister(3).getValue() + "/" + this.spi.getInputRegister(4).getValue() + "/" + this.spi.getInputRegister(5).getValue());
-			System.err.println("Output Registers : " + this.spi.getRegister(0).getValue());
-			*/
-
 			//Update moving status
 			if (bridgeMotor.isMoving() == false) {
 				this.spi.setInputRegister(STATUS_SENSOR_MOVE, new SimpleInputRegister(0));
 			}
 			
-			//Local control (buttons)
+		//Local control (buttons)
 			//Raise
 			if (((int)this.spi.getInputRegister(STATUS_SENSOR_BUTTON).getValue() & Button.ID_UP) != 0) {
 				this.spi.setDigitalOut(STATUS_BRIDGE_RAISE, new SimpleDigitalOut(true)); 
@@ -249,7 +260,35 @@ public class Bridge extends Device {
 						addCar();
 					}				
 				}
-						
+				
+				
+				//Detect new boat
+				boatColorId = this.spi.getInputRegister(STATUS_BOAT_COLOR).getValue();
+				if (boatColorId != refColorId && boatPresence == false) {
+					boatPresence = true;
+					waitingBoats.add(boatColorId);
+				}
+				
+				if (boatColorId == refColorId && boatPresence == true) {
+					boatPresence = false;
+				}
+				
+				//Detect if boat has gone
+				if (this.spi.getInputRegister(STATUS_SENSOR_BOAT).getValue() == 1) {
+					if (!waitingBoats.isEmpty()) {
+						waitingBoats.remove();
+					}
+				}
+				
+				//Set waiting boat
+				if (waitingBoats.isEmpty()) {
+					this.spi.setDigitalIn(STATUS_WAITING_BOAT, new SimpleDigitalIn(false));						
+					this.spi.setInputRegister(STATUS_BOAT_QUEUE, new SimpleRegister(0));						
+				} else {
+					this.spi.setDigitalIn(STATUS_WAITING_BOAT, new SimpleDigitalIn(true));						
+					this.spi.setInputRegister(STATUS_BOAT_QUEUE, new SimpleRegister(waitingBoats.size()));						
+				}
+/*
 				//Detect waiting boat if bridge is up
 				if (this.spi.getInputRegister(STATUS_SENSOR_BOAT).getValue() == 1) {
 					if (bridgeIsDown()) {
@@ -260,6 +299,8 @@ public class Bridge extends Device {
 				if (bridgeIsUp()) {
 					this.spi.setDigitalIn(STATUS_WAITING_BOAT, new SimpleDigitalIn(false));	
 				}
+*/
+				
 				
 			//Bridge unactivated
 //			} else {
@@ -283,7 +324,7 @@ public class Bridge extends Device {
 		LCD.drawString("Bridge Path : " + this.spi.getInputRegister(STATUS_SENSOR_ANGLE).getValue(), 0, 2);
 		LCD.drawString("Bridge Gyro : " + this.spi.getInputRegister(STATUS_SENSOR_GYRO).getValue(), 0, 3);
 		LCD.drawString("Cars viewed  : " + this.spi.getRegister(STATUS_NB_CARS).getValue(), 0, 4);
-		LCD.drawString("Boat waiting : " + this.spi.getDigitalIn(STATUS_WAITING_BOAT).isSet(), 0, 5);
+		LCD.drawString("Boat waiting : " + this.spi.getInputRegister(STATUS_BOAT_QUEUE).getValue(), 0, 5);
 		LCD.drawString("ESC Exit", 7, 6);
 	}
 	
