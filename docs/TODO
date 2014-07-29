@@ -1,11 +1,21 @@
 
 - Jamod
 	* Msg types : all others types to implement
+
+- OpenDNP3
+        * add implementation to testbed
+
 - Better graphics on IHM
 	* Manage exceptions (connect)
+
 - Bridge
 	* Pb Gyro sensor
+
 - Toll
-	* better Lego construction
+	* 
+
+- Rover
+        * Better implementation (speed, direction, etc)
+
 - Other
-	* make works with Wifi
+	* 

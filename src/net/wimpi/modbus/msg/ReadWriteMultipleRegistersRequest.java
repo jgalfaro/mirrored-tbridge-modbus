@@ -364,7 +364,6 @@ public final class ReadWriteMultipleRegistersRequest
     } else {
       m_NonWordDataHandler_W.readData(din, m_Reference_W, wc);
     }  
-//TODO: Test on coherence on bc
     
   }//readData
 

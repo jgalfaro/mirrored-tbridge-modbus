@@ -39,8 +39,8 @@ import lejos.utility.Delay;
  * @version 1.0
  */
 public class Bridge extends Device {
-	public Bridge(String modbusAddr, int modbusPort, int modbusUnitId) {
-		super(modbusAddr, modbusPort, modbusUnitId);
+	public Bridge(String deviceAddr, Boolean modbusActive, int modbusPort, int modbusUnitId, Boolean dnp3Active, int dnp3Port, int dnp3UnitId) {
+		super(deviceAddr, modbusActive, modbusPort, modbusUnitId, dnp3Active, dnp3Port, dnp3UnitId);
 	}
 	public EV3 ev3 = null;
 	private DifferentialPilot bridgeMotor = null;
@@ -84,7 +84,7 @@ public class Bridge extends Device {
 	/*
 	 * Modbus initialisation
 	 */
-	public void initSpi() {	
+	public void initModbusSpi() {	
 		this.spi = new SimpleProcessImage();
 
 		//Discrete Input
@@ -113,7 +113,7 @@ public class Bridge extends Device {
 		
 	}
 	
-	public void initMbIdentification() {
+	public void initModbusIdentification() {
 		this.mbIdent = new ModbusDeviceIdentification();
 		
 		this.mbIdent.setIdentification(0, "TELECOM SUD PARIS");
@@ -126,7 +126,12 @@ public class Bridge extends Device {
 		this.mbIdent.setIdentification(130, "NICE Comment for a bridge");
 		this.mbIdent.setIdentification(131, "New comment for a bigger bridge");
 	}
-		
+	
+	@Override
+	public void initDnp3Config() {
+//TODO: Complete this device db
+	}
+
 	/*
 	 * EV3 Initialisation
 	 */

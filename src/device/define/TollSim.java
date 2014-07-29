@@ -3,7 +3,9 @@ package device.define;
 import java.awt.Color;
 import java.util.concurrent.TimeUnit;
 
-import device.util.UltrasonicSensorRegisterIn;
+import com.automatak.dnp3.DatabaseConfig;
+import com.automatak.dnp3.OutstationStackConfig;
+import com.automatak.dnp3.StaticAnalogResponse;
 
 //Modbus imports
 import net.wimpi.modbus.ModbusDeviceIdentification;
@@ -19,8 +21,8 @@ import net.wimpi.modbus.procimg.SimpleRegister;
  * @version 1.0
  */
 public class TollSim extends Device {
-	public TollSim(String modbusAddr, int modbusPort, int modbusUnitId) {
-		super(modbusAddr, modbusPort, modbusUnitId);
+	public TollSim(String deviceAddr, Boolean modbusActive, int modbusPort, int modbusUnitId, Boolean dnp3Active, int dnp3Port, int dnp3UnitId) {
+		super(deviceAddr, modbusActive, modbusPort, modbusUnitId, dnp3Active, dnp3Port, dnp3UnitId);
 	}
 	public static TollSimFrame window;
 
@@ -42,10 +44,13 @@ public class TollSim extends Device {
 	private static final int STATUS_KEY_PRESS = 3;
 	private static final int STATUS_CAR_PRESENTING = 4;
 
+	
+	
+	
 	/*
 	 * Modbus initialisation
 	 */
-	public void initSpi() {		
+	public void initModbusSpi() {		
 		this.spi = new SimpleProcessImage();
 
 		//Discrete output
@@ -68,7 +73,7 @@ public class TollSim extends Device {
 		
 	}
 	
-	public void initMbIdentification() {
+	public void initModbusIdentification() {
 		this.mbIdent = new ModbusDeviceIdentification();
 		
 		this.mbIdent.setIdentification(0, "TELECOM SUD PARIS");
@@ -105,6 +110,19 @@ public class TollSim extends Device {
 		this.mbIdent.setIdentification(154, "NICE Comment for a simulatedfgffdsgdd toll");
 		this.mbIdent.setIdentification(155, "NICE Comment for a simulated tolgsfdgsl");
 	}
+	
+
+	@Override
+	public void initDnp3Config() {
+        // Outstation will have 5 of every measurement type
+		DatabaseConfig dnp3Db = new DatabaseConfig(1,5,2,2,0);
+        // Create the default outstation configuration
+        dnp3Config = new OutstationStackConfig(dnp3Db);
+        dnp3Config.outstationConfig.staticAnalogInput = StaticAnalogResponse.GROUP30_VAR1;
+
+	}
+
+	
 	
 	@Override
 	public void initEV3() {
