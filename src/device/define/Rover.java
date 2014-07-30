@@ -24,8 +24,8 @@ import lejos.robotics.navigation.DifferentialPilot;
  * http://www.rapidpm.org/2014/01/lego-mindstorms-ev3-components-infrared.html
  */
 public class Rover extends Device {
-	public Rover(String deviceAddr, Boolean modbusActive, int modbusPort, int modbusUnitId, Boolean dnp3Active, int dnp3Port, int dnp3UnitId) {
-		super(deviceAddr, modbusActive, modbusPort, modbusUnitId, dnp3Active, dnp3Port, dnp3UnitId);
+	public Rover(String deviceAddr, Boolean modbusActive, int modbusPort, int modbusUnitId) {
+		super(deviceAddr, modbusActive, modbusPort, modbusUnitId);
 	}
 	
 	public EV3 ev3 = null;
@@ -103,11 +103,6 @@ public class Rover extends Device {
 		this.mbIdent.setIdentification(130, "NICE Comment");
 	}
 	
-	@Override
-	public void initDnp3Config() {
-//TODO: Complete this device db
-	}
-
 	/*
 	 * EV3 Initialisation
 	 */

@@ -14,11 +14,6 @@ public class DeviceInit {
 	private static int modbusPort = 502;
 	private static int modbusUnitId = 1;
 	
-	//DNP3 params
-	private static boolean dnp3Active = false;
-	private static int dnp3Port = 20000;
-	private static int dnp3UnitId = 1;
-
 	//Type of device (Toll, Bridge, TollSim, Rover)
 	private static String deviceType = "";
 	
@@ -34,13 +29,13 @@ public class DeviceInit {
 		read_init("Device.ini");
 	    
 		if (deviceType.equals("TOLL")) {
-		    device = new Toll(deviceAddr, modbusActive, modbusPort, modbusUnitId, dnp3Active, dnp3Port, dnp3UnitId);
+		    device = new Toll(deviceAddr, modbusActive, modbusPort, modbusUnitId);
 		} else if (deviceType.equals("TOLL_SIM")) {
-		    device = new TollSim(deviceAddr, modbusActive, modbusPort, modbusUnitId, dnp3Active, dnp3Port, dnp3UnitId);
+		    device = new TollSim(deviceAddr, modbusActive, modbusPort, modbusUnitId);
 		} else if (deviceType.equals("BRIDGE")) {
-		    device = new Bridge(deviceAddr, modbusActive, modbusPort, modbusUnitId, dnp3Active, dnp3Port, dnp3UnitId);
+		    device = new Bridge(deviceAddr, modbusActive, modbusPort, modbusUnitId);
 		} else if (deviceType.equals("ROVER")) {
-		    device = new Rover(deviceAddr, modbusActive, modbusPort, modbusUnitId, dnp3Active, dnp3Port, dnp3UnitId);
+		    device = new Rover(deviceAddr, modbusActive, modbusPort, modbusUnitId);
 		} else {
 			System.err.println("Device type ("+deviceType+") unknown");
 		}
@@ -50,17 +45,11 @@ public class DeviceInit {
 			if (device.getModbusActivated()) {
 				device.initModbus();
 			}
-			if (device.getDnp3Activated()) {
-				device.initDnp3();
-			}
 			
 			device.beep();
 			device.run();
 			device.beep();
 			
-			if (device.getDnp3Activated()) {
-				device.stopDnp3();
-			}
 			if (device.getModbusActivated()) {
 				device.stopModbus();
 			}
@@ -85,10 +74,6 @@ public class DeviceInit {
 		modbusActive = Boolean.parseBoolean(p.getProperty("DEVICE_MOD_ACTIVE"));
 		modbusUnitId = Integer.parseInt(p.getProperty("DEVICE_MOD_ID"));
 		modbusPort = Integer.parseInt(p.getProperty("DEVICE_MOD_PORT"));
-
-		dnp3Active = Boolean.parseBoolean(p.getProperty("DEVICE_DNP_ACTIVE"));
-		dnp3UnitId = Integer.parseInt(p.getProperty("DEVICE_DNP_ID"));
-		dnp3Port = Integer.parseInt(p.getProperty("DEVICE_DNP_PORT"));
 
 		deviceType = p.getProperty("DEVICE_TYPE");
 	}

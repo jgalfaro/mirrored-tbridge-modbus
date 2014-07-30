@@ -4,12 +4,6 @@
 	<classpathentry kind="con" path="org.lejos.ev3.ldt.LEJOS_EV3_LIBRARY_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/comm.jar"/>
-	<classpathentry kind="lib" path="lib/opendnp3-api-1.1.1.RC5-javadoc.jar"/>
-	<classpathentry kind="lib" path="lib/opendnp3-api-1.1.1.RC5-sources.jar"/>
-	<classpathentry kind="lib" path="lib/opendnp3-api-1.1.1.RC5.jar"/>
-	<classpathentry kind="lib" path="lib/opendnp3-bindings-1.1.1.RC5-javadoc.jar"/>
-	<classpathentry kind="lib" path="lib/opendnp3-bindings-1.1.1.RC5-sources.jar"/>
-	<classpathentry kind="lib" path="lib/opendnp3-bindings-1.1.1.RC5.jar"/>
 	<classpathentry kind="lib" path="lib/RXTXcomm.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

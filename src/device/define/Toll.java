@@ -1,7 +1,5 @@
 package device.define;
 
-import com.automatak.dnp3.DatabaseConfig;
-
 import device.util.ButtonSensorRegisterIn;
 import device.util.ColorSensorRegisterIn;
 import device.util.TouchSensorRegisterIn;
@@ -37,8 +35,8 @@ import lejos.utility.Delay;
  * @version 1.0
  */
 public class Toll extends Device {
-	public Toll(String deviceAddr, Boolean modbusActive, int modbusPort, int modbusUnitId, Boolean dnp3Active, int dnp3Port, int dnp3UnitId) {
-		super(deviceAddr, modbusActive, modbusPort, modbusUnitId, dnp3Active, dnp3Port, dnp3UnitId);
+	public Toll(String deviceAddr, Boolean modbusActive, int modbusPort, int modbusUnitId) {
+		super(deviceAddr, modbusActive, modbusPort, modbusUnitId);
 	}
 	public EV3 ev3 = null;
 
@@ -107,11 +105,7 @@ public class Toll extends Device {
 		this.mbIdent.setIdentification(6, "LEGO TOLL LEJOS");
 		this.mbIdent.setIdentification(130, "NICE Comment");
 	}
-	
-	@Override
-	public void initDnp3Config() {
-//TODO: Complete this device db
-	}
+
 	/*
 	 * EV3 Initialisation
 	 */
