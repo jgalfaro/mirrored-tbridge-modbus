@@ -10,6 +10,7 @@ It implements :
 ### How do I get set up? ###
 
 help for installation of Lejos environnement on : http://thinkbricks.net/?p=826
+Some other help to configure : http://hirt.se/blog/?p=489
 
 A. Configuration of Home Computer
 	1. Configure Eclipse as mentionned by Lejos
@@ -34,7 +35,6 @@ B. Configuration of EV3 :
 
 C. Configuration of Control Center :
 	1. with Eclipse, compile and launch "ControlCenter"
-
 
 
 
