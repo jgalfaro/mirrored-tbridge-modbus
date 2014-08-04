@@ -23,6 +23,7 @@ B. Configuration of EV3 :
 		b. copy Lejos files
 		c. copy Embedded JRE
 		d. Start EV3 with Micro SD
+		e. Proceed to configuration (see FAQ)
 	2. Configure Lejos
 		a. connect to Lejos (USB/Bluetooth/WIFI)
 			after having plugged the EV3 :
@@ -37,7 +38,10 @@ C. Configuration of Control Center :
 	1. with Eclipse, compile and launch "ControlCenter"
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 80845ac196f7570b4dc122736d326e10079a96a6
 FAQ :
 * How to change IP address/range
 
@@ -49,3 +53,5 @@ FAQ :
 	    # change IP range fo the DHCP server
 	4. restart EV3
 		# reboot
+
+

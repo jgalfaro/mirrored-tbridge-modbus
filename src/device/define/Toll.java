@@ -35,8 +35,8 @@ import lejos.utility.Delay;
  * @version 1.0
  */
 public class Toll extends Device {
-	public Toll(String modbusAddr, int modbusPort, int modbusUnitId) {
-		super(modbusAddr, modbusPort, modbusUnitId);
+	public Toll(String deviceAddr, Boolean modbusActive, int modbusPort, int modbusUnitId) {
+		super(deviceAddr, modbusActive, modbusPort, modbusUnitId);
 	}
 	public EV3 ev3 = null;
 
@@ -71,7 +71,7 @@ public class Toll extends Device {
 	/*
 	 * Modbus initialisation
 	 */
-	public void initSpi() {		
+	public void initModbusSpi() {		
 		this.spi = new SimpleProcessImage();
 
 		//Discrete output
@@ -93,7 +93,7 @@ public class Toll extends Device {
 		this.spi.addInputRegister(new UltrasonicSensorRegisterIn(this.distanceUSSensor)); //4 STATUS_CAR_PRESENTING
 	}
 	
-	public void initMbIdentification() {
+	public void initModbusIdentification() {
 		this.mbIdent = new ModbusDeviceIdentification();
 		
 		this.mbIdent.setIdentification(0, "TELECOM SUD PARIS");
@@ -105,6 +105,7 @@ public class Toll extends Device {
 		this.mbIdent.setIdentification(6, "LEGO TOLL LEJOS");
 		this.mbIdent.setIdentification(130, "NICE Comment");
 	}
+
 	/*
 	 * EV3 Initialisation
 	 */

@@ -38,7 +38,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import net.wimpi.modbus.procimg.Register;
-import net.wimpi.modbus.procimg.SimpleRegister;
 import net.wimpi.modbus.procimg.ProcessImageFactory;
 import net.wimpi.modbus.ModbusCoupler;
 

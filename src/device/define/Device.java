@@ -19,25 +19,31 @@ abstract class Device  {
 	public ModbusDeviceIdentification mbIdent = null;
 	public ModbusTCPListener listener = null;
 
-	private String modbusAddr = "";
+	private String deviceAddr = "";
+	private boolean modbusActive = false;
 	private int modbusPort = 502;
 	private int modbusNbThread = 2;
 	public int modbusUnitId = 1;
 
-	public Device(String modbusAddr, int modbusPort, int modbusUnitId) {
-		this.modbusAddr = modbusAddr;
+	
+
+	public Device(String deviceAddr, Boolean modbusActive, int modbusPort, int modbusUnitId) {
+		this.deviceAddr = deviceAddr;
+
+		this.setModbusActivated(modbusActive);		
 		this.modbusPort = modbusPort;
 		this.modbusUnitId = modbusUnitId;
+
 	}
 	
 	/*
 	 * Modbus initialisation
 	 */
 	public void initModbus() {
-		this.initSpi();
+		this.initModbusSpi();
 		//this.spi.setLocked(true);
 
-		this.initMbIdentification();
+		this.initModbusIdentification();
 
 		ModbusCoupler.getReference().setProcessImage(this.spi);
 		ModbusCoupler.getReference().setIdentification(this.mbIdent);
@@ -45,9 +51,9 @@ abstract class Device  {
 		ModbusCoupler.getReference().setUnitID(this.modbusUnitId);		
 		
 		this.listener = new ModbusTCPListener(this.modbusNbThread);
-		if (modbusAddr != "") {
+		if (deviceAddr != "") {
 			try {
-				this.listener.setAddress(InetAddress.getByName(this.modbusAddr));
+				this.listener.setAddress(InetAddress.getByName(this.deviceAddr));
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
 			}
@@ -55,11 +61,7 @@ abstract class Device  {
 		this.listener.setPort(this.modbusPort);
 		this.listener.start(); 
 	}
-	
-	abstract public void initSpi();
-	abstract public void initMbIdentification();
-	
-	
+
 	/*
 	 * Modbus unload
 	 */
@@ -68,7 +70,18 @@ abstract class Device  {
 			this.listener.stop();
 		}
 	}
+	public void setModbusActivated( boolean status) {
+		this.modbusActive = status;
+	}
 	
+	public boolean getModbusActivated( ) {
+		return this.modbusActive;
+	}
+	
+	abstract public void initModbusSpi();
+	abstract public void initModbusIdentification();
+	
+
 	/*
 	 * EV3 Initialisation
 	 */

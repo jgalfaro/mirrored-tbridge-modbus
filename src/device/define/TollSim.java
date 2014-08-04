@@ -3,8 +3,6 @@ package device.define;
 import java.awt.Color;
 import java.util.concurrent.TimeUnit;
 
-import device.util.UltrasonicSensorRegisterIn;
-
 //Modbus imports
 import net.wimpi.modbus.ModbusDeviceIdentification;
 import net.wimpi.modbus.procimg.SimpleDigitalIn;
@@ -19,8 +17,8 @@ import net.wimpi.modbus.procimg.SimpleRegister;
  * @version 1.0
  */
 public class TollSim extends Device {
-	public TollSim(String modbusAddr, int modbusPort, int modbusUnitId) {
-		super(modbusAddr, modbusPort, modbusUnitId);
+	public TollSim(String deviceAddr, Boolean modbusActive, int modbusPort, int modbusUnitId) {
+		super(deviceAddr, modbusActive, modbusPort, modbusUnitId);
 	}
 	public static TollSimFrame window;
 
@@ -42,10 +40,13 @@ public class TollSim extends Device {
 	private static final int STATUS_KEY_PRESS = 3;
 	private static final int STATUS_CAR_PRESENTING = 4;
 
+	
+	
+	
 	/*
 	 * Modbus initialisation
 	 */
-	public void initSpi() {		
+	public void initModbusSpi() {		
 		this.spi = new SimpleProcessImage();
 
 		//Discrete output
@@ -68,7 +69,7 @@ public class TollSim extends Device {
 		
 	}
 	
-	public void initMbIdentification() {
+	public void initModbusIdentification() {
 		this.mbIdent = new ModbusDeviceIdentification();
 		
 		this.mbIdent.setIdentification(0, "TELECOM SUD PARIS");
@@ -105,6 +106,7 @@ public class TollSim extends Device {
 		this.mbIdent.setIdentification(154, "NICE Comment for a simulatedfgffdsgdd toll");
 		this.mbIdent.setIdentification(155, "NICE Comment for a simulated tolgsfdgsl");
 	}
+	
 	
 	@Override
 	public void initEV3() {

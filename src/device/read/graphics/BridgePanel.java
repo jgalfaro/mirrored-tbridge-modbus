@@ -83,7 +83,7 @@ public class BridgePanel extends DevicePanel implements ActionListener {
 	    picWaitingBoat = new JLabel( new ImageIcon( "/home/user/projects/tollbridge/src/control/boat.png"));
 	    picWaitingBoat.setBounds(250, 10, 50, 50);
 	    content.add(picWaitingBoat);
-		jlbBdgBoatWaiting = new JLabel("Boat waiting");
+		jlbBdgBoatWaiting = new JLabel();
 		jlbBdgBoatWaiting.setBounds(230, 65, 150, 15);
 		content.add(jlbBdgBoatWaiting);
 
@@ -256,6 +256,8 @@ public class BridgePanel extends DevicePanel implements ActionListener {
 	}
 	
 	public void showWaitingBoat(boolean boatWaiting) {
+		picWaitingBoat.setVisible(true);
+/*		
 		if (boatWaiting == true) {
 			picWaitingBoat.setVisible(true);
 			jlbBdgBoatWaiting.setVisible(true);
@@ -263,7 +265,15 @@ public class BridgePanel extends DevicePanel implements ActionListener {
 			picWaitingBoat.setVisible(false);
 			jlbBdgBoatWaiting.setVisible(false);
 		}
-		
+	*/	
 	}	
 
+	public void setNbBoatWaiting(int nbBoat) {
+		if (nbBoat == 0) {
+			this.jlbBdgBoatWaiting.setText("No boat" );			
+		} else {
+			this.jlbBdgBoatWaiting.setText(nbBoat + " is waiting" );
+		}
+	}
+	
 }

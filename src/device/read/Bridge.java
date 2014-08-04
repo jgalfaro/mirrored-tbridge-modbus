@@ -8,7 +8,7 @@ import device.read.graphics.BridgePanel;
 public class Bridge extends Device {
 
 	private static int BRIDGE_ANGLE = 12;
-	
+
 	//Discrete Input
 	private static final int STATUS_BARRIER = 0;
 	private static final int STATUS_WAITING_BOAT = 1;
@@ -30,6 +30,8 @@ public class Bridge extends Device {
 	private static final int STATUS_SENSOR_BOAT = 4;
 	private static final int STATUS_SENSOR_MOVE = 5;
 	private static final int STATUS_SENSOR_ANGLE = 6;
+	private static final int STATUS_BOAT_COLOR = 7;
+	private static final int STATUS_BOAT_QUEUE = 8;
 
 	
 	public BridgePanel panel;
@@ -157,7 +159,15 @@ public class Bridge extends Device {
 	public int getStatusBridgeAngle() {
 		return this.getIntRO(Bridge.STATUS_SENSOR_ANGLE);		
 	}	
-	
+
+	public int getStatusBoatColor() {
+		return this.getIntRO(Bridge.STATUS_BOAT_COLOR);		
+	}	
+
+	public int getStatusBoatQueue() {
+		return this.getIntRO(Bridge.STATUS_BOAT_QUEUE);		
+	}	
+
 	//Register
 	public int getStatusNbCars() {
 		return this.getIntRW(Bridge.STATUS_NB_CARS);

@@ -33,6 +33,8 @@
  ***/
 package net.wimpi.modbus.procimg;
 
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Vector;
 
 /**
@@ -50,7 +52,7 @@ public class SimpleProcessImage
   protected Vector m_DigitalInputs;
   protected Vector m_DigitalOutputs;
   protected Vector m_InputRegisters;
-  protected Vector m_Registers;
+  protected Vector m_Registers; 
   protected boolean m_Locked = false;
 
   /**
@@ -269,5 +271,5 @@ public class SimpleProcessImage
       return iregs;
     }
   }//getRegisterRange
-
+    
 }//class SimpleProcessImage
