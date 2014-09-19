@@ -38,10 +38,6 @@ C. Configuration of Control Center :
 	1. with Eclipse, compile and launch "ControlCenter"
 
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 80845ac196f7570b4dc122736d326e10079a96a6
 FAQ :
 * How to change IP address/range
 
