@@ -1,17 +1,16 @@
-# README #
+Initial testbed for [Modbus](http://en.wikipedia.org/wiki/Modbus).
 
-"tollbridge" is a test bed for modbus (SCADA Network Protocol).
-It implements :
+It implements:
 * a control center,
 * a Lego EV3 bridge,
 * a Lego EV3 toll,
 * a Simulated toll.
 
-### How do I get set up? ###
+Installation of Lejos environment at [http://thinkbricks.net/?p=826](http://thinkbricks.net/?p=826)
 
-help for installation of Lejos environnement on : http://thinkbricks.net/?p=826
-Some other help to configure : http://hirt.se/blog/?p=489
+Some further details at [http://hirt.se/blog/?p=489](http://hirt.se/blog/?p=489)
 
+```
 A. Configuration of Home Computer
 	1. Configure Eclipse as mentionned by Lejos
 	2. Git clone project
@@ -38,8 +37,7 @@ C. Configuration of Control Center :
 	1. with Eclipse, compile and launch "ControlCenter"
 
 
-FAQ :
-* How to change IP address/range
+* How to change the IP address/network
 
 	1. Login on EV3 :
 		# ssh root@10.0.1.1
@@ -49,5 +47,4 @@ FAQ :
 	    # change IP range fo the DHCP server
 	4. restart EV3
 		# reboot
-
-
+```
