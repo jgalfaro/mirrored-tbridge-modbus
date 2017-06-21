@@ -6,9 +6,12 @@ It implements:
 * a Lego EV3 toll,
 * a Simulated toll.
 
+
 Installation of Lejos environment at [http://thinkbricks.net/?p=826](http://thinkbricks.net/?p=826)
 
+
 Some further details at [http://hirt.se/blog/?p=489](http://hirt.se/blog/?p=489)
+
 
 ```
 A. Configuration of Home Computer
